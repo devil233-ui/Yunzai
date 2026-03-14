@@ -10,7 +10,7 @@ export class status extends plugin {
       event: "message",
       rule: [
         {
-          reg: "^#(状态|统计)",
+          reg: "^#?伊涅芙(状态|统计)",
           fnc: "status",
         },
       ],
