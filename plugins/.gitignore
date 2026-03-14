@@ -19,6 +19,7 @@ other/**
 !example
 example/**
 !example/进群退群通知.js
+!备份&还原膏剂.js
 
 *.psd
 *.map
