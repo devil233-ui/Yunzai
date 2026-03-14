@@ -1,0 +1,116 @@
+{{extend newdefLayout}}
+
+{{block 'css'}}
+<link rel="stylesheet" type="text/css" href="{{_res_path}}html/player/role-explore.css"/>
+<style type="text/css">
+.container {
+  background-image: url({{data.bg_img}});
+}
+</style>
+{{/block}}
+
+{{block 'main'}}
+<div class="head_box">
+  <img class="icon" src={{data.game_head_icon}}>
+  <div class="info_box">
+    <div class="id_text">{{data.nickname}}<span
+      style="font-size:8px;margin-left: 5px">Lv.{{data.level}}</span></div>
+    <div class="day_text">
+      <div class="region">{{data.region}}</div>
+      <div class="uid"><span class="line"></span>UID{{uid}}</div>
+    </div>
+  </div>
+  <img class="genshin_logo" src="{{_res_path}}img/other/原神.png">
+</div>
+<div class="data_box">
+  <div class="data_head_line">
+    {{each data.head item idx}}
+    {{if idx!==0}}<span class="line"></span>{{/if}}
+    <div class="data_head_item">
+      <div class="num">{{item.num || "-"}}
+        {{if item.extra}}<span>/{{item.extra}}</span>{{/if}}
+      </div>
+      <div class="lable">{{item.lable}}</div>
+    </div>
+    {{/each}}
+  </div>
+  {{each line val}}
+  <div class="data_line">
+    {{each val item}}
+    <div class="data_line_item">
+      <div class="num">{{item.num}}
+        {{if item.extra}}<span>/{{item.extra}}</span>{{/if}}
+      </div>
+      <div class="lable">{{item.lable}}</div>
+    </div>
+    {{/each}}
+  </div>
+  {{/each}}
+</div>
+
+<div class="other_box">
+  {{if basicInfo?.level>0}}
+  <div class="basicInfo">
+    <div class="tab_lable">
+      <div class="icon-left"></div>
+      七圣召唤
+    </div>
+    <div class="basicInfo_header">
+      <div class="basicInfo_icon"><span>{{basicInfo.level}}</span></div>
+      <div class="basicInfo_right">
+        <div class="item">
+          <div>已收集角色牌</div>
+          <div>{{basicInfo.avatar_card_num_gained}}/{{basicInfo.avatar_card_num_total}}</div>
+        </div>
+        <div class="item">
+          <div>已收集行动牌</div>
+          <div>{{basicInfo.action_card_num_gained}}/{{basicInfo.action_card_num_total}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  {{if data?.homes}}
+  <div class="homesInfo">
+    <div class="tab_lable">
+      <div class="icon-left"></div>
+      尘歌壶
+    </div>
+    <div class="homesInfo homesInfo_header" style="background-image: url('{{data.homes.icon}}');">
+      <div class="tab_lable">
+        <div class="icon-left" style="background-image: url('{{data.homes.comfort_icon}}');"></div>
+        {{data.homes.comfort_name}}
+        <div class="name-right">{{data.homes.name}}</div>
+      </div>
+      <div class="data_head_line">
+        {{each data.homes.line item idx}}
+        {{if idx!==0}}<span class="line"></span>{{/if}}
+        <div class="data_head_item">
+          <div class="num">{{item.num || "-"}}</div>
+          <div class="lable">{{item.lable}}</div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="explor_box">
+    <div class="tab_lable">
+      <div class="icon-left"></div>
+      地图探险
+    </div>
+    {{each explor val}}
+    <div class="item" style="background-image: url('{{_res_path}}html/player/items/{{val.name}}.png');" data-name="{{val.name}}">
+      <img class="icon" src="{{_res_path}}img/other/{{val.name}}.png"/>
+      <div class="content">
+        {{each val.line line}}
+        <p class="name">{{line.name}}：<span class="num">{{line.text}}</span></p>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+{{/block}}

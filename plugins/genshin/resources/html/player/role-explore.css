@@ -1,0 +1,385 @@
+@font-face {
+  font-family: "YS";
+  src: url("../../font/YS.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: "YS";
+}
+body {
+  z-index: -1;
+  font-size: 18px;
+  color: #1e1f20;
+  transform: scale(1.5);
+  transform-origin: 0 0;
+}
+.container {
+  width: 470px;
+  padding: 10px 0;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+}
+.base_info {
+  position: relative;
+  padding-left: 10px;
+}
+.head_box {
+  margin: 10px 0px;
+  padding: 0px 27px;
+  display: flex;
+}
+.head_box .icon {
+  width: 50px;
+  border-radius: 50%;
+  border: 2px solid #d3bc8e;
+}
+.info_box {
+  align-content: space-around;
+}
+.head_box .id_text {
+  font-size: 14px;
+  position: relative;
+  left: 10px;
+  margin-bottom: 5px;
+  color: #fff;
+  font-weight: 600;
+}
+.id_text span {
+  font-weight: 500;
+  display: inline-block;
+  width: 28px;
+  padding: 2px 1px;
+  text-align: center;
+  background-color: #b49872;
+  border-radius: 3px;
+  color: #f8f5f1;
+  position: relative;
+  bottom: 2px;
+}
+.head_box .day_text {
+  font-size: 16px;
+  position: relative;
+  left: 10px;
+  display: flex;
+  color: #fff;
+}
+.head_box .uid .line,
+.data_head_line .line {
+  display: inline-block;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  height: 17px;
+  vertical-align: middle;
+  margin: 1px 5px;
+}
+.head_box .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 5em;
+}
+.head_box .genshin_logo {
+  position: absolute;
+  top: 10px;
+  right: 143px;
+  width: 97px;
+}
+.other_box {
+  position: relative;
+  top: -9px;
+  background: #ffffff;
+  padding: 20px 10px 0;
+  border-radius: 15px 15px 0 0;
+}
+.icon-left {
+  height: 16px;
+  width: 16px;
+  margin-right: 2px;
+  background-size: cover;
+  background-image: url("./items/icon-left.png");
+}
+.basicInfo,
+.homesInfo {
+  padding: 10px 5px 15px;
+  background: #f5f5f5;
+  box-shadow: 0 5px 10px 0 rgb(0 0 0 / 35%);
+  border-radius: 15px;
+  position: relative;
+  margin-bottom: 20px;
+}
+.basicInfo_header {
+  display: flex;
+}
+.basicInfo_icon {
+  display: inline-block;
+  position: relative;
+}
+.basicInfo_icon {
+  background-image: url(../../img/deck/七圣召唤.png);
+  background-size: 70px 70px;
+  background-repeat: no-repeat;
+  width: 67px;
+  color: #fff;
+  text-align: center;
+  font-size: 35px;
+  line-height: 70px;
+  margin: 10px 10px 0;
+}
+.basicInfo_right {
+  display: inline-block;
+  width: calc(78% - 15px);
+  padding: 10px 0px;
+  margin-left: 7px;
+}
+.basicInfo_right .item {
+  width: 100%;
+  padding: 5px 10px 0;
+  height: 29px;
+  color: #877254;
+  font-size: 13px;
+  border: 1px solid #ebeadc;
+  margin: 5px 0;
+  background-color: #f5eee4;
+  display: flex;
+}
+.basicInfo_right .item div:first-child {
+  width: 50%;
+}
+.basicInfo_right .item div:nth-child(2) {
+  width: 50%;
+  text-align: right;
+}
+.homesInfo_header {
+  box-shadow: none;
+  padding: 10px 0 15px;
+  margin: 10px 0 0;
+}
+.homesInfo_header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  background: rgba(0,0,0,.48);
+  z-index: 0;
+}
+.homesInfo_header .tab_lable {
+  color: #fff;
+}
+.homesInfo .name-right {
+  position: absolute;
+  right: 10px;
+}
+.homesInfo .data_head_line {
+  position: relative;
+  margin: 0;
+  padding: 10px;
+  background: rgba(60,64,68,.3);
+  z-index: 1;
+}
+.data_box {
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 9px;
+  margin: 0 14px;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.15);
+  padding: 20px 13px 25px 13px;
+  position: relative;
+  z-index: 0;
+}
+.data_box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  background: rgba(0,0,0,.48);
+  backdrop-filter: blur(9px);
+  z-index: -1;
+}
+.tab_lable {
+  display: flex;
+  width: 100%;
+  position: relative;
+  color: #1e1f4b;
+  font-size: 14px;
+  padding: 3px 10px;
+  border-radius: 15px 0px 15px 15px;
+}
+.data_line,
+.data_head_line {
+  display: flex;
+}
+.data_head_line .num {
+  color: rgba(255,255,255,.9);
+}
+.data_head_line .line {
+  margin: 2px 5px;
+  height: 25px;
+}
+.data_head_line {
+  width: 100%;
+  justify-content: space-around;
+  margin: 0px 20px 10px;
+}
+.data_head_item {
+  text-align: center;
+}
+.data_line_item {
+  width: 96px;
+  margin: 4px;
+  background-color: rgba(255,255,255,.08);
+  text-align: center;
+  padding: 8px 11px;
+  border-radius: 5px;
+  border: .5px solid rgba(255,255,255,.08);
+}
+.num {
+  color: rgba(255,255,255,.75);
+  font-size: 14px;
+}
+.num span {
+  font-size: 10px;
+  color: rgba(255,255,255,.45);
+  margin-left: -4px;
+}
+.explor_box .num {
+  color: rgba(255,255,255);
+  font-size: 12px;
+}
+.lable {
+  font-size: 11px;
+  color: rgba(255,255,255,.50);
+  line-height: 1;
+  margin-top: 3px;
+}
+.explor_box {
+  position: relative;
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-radius: 15px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.15);
+  padding: 15px;
+}
+.explor_box .tab_lable {
+  padding: 3px 0;
+}
+.explor_box .item {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  width: 200px;
+  height: 85px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  color: #fff;
+  line-height: 1;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.explor_box .item[data-name="蒙德"] {
+  background-color: rgb(74, 100, 92);
+}
+.explor_box .item[data-name="璃月"] {
+  background-color: rgb(124, 99, 76);
+}
+.explor_box .item[data-name="雪山"] {
+  background-color: rgb(82, 97, 129);
+}
+.explor_box .item[data-name="稻妻"] {
+  background-color: rgb(85, 79, 89);
+}
+.explor_box .item[data-name="渊下宫"] {
+  background-color: rgb(74, 83, 102);
+}
+.explor_box .item[data-name="层岩巨渊"] {
+  background-color: rgb(86, 79, 73);
+}
+.explor_box .item[data-name="须弥"] {
+  background-color: rgb(94, 100, 77);
+}
+.explor_box .item[data-name="枫丹"] {
+  background-color: rgb(68, 82, 111);
+}
+.explor_box .item[data-name="沉玉谷"] {
+  background-color: rgb(74, 83, 102);
+}
+.explor_box .item[data-name="旧日之海"] {
+  background-color: rgb(72, 85, 115);
+}
+.explor_box .item[data-name="纳塔"] {
+  background-color: rgb(103, 80, 75);
+}
+.explor_box .item[data-name="远古圣山"] {
+  background-color: rgb(82, 97, 129);
+}
+.explor_box .item[data-name="挪德卡莱"] {
+  background-color: rgb(75, 86, 129);
+}
+.explor_box .icon {
+  width: 62px;
+  margin-left: 3px;
+}
+.explor_box .content {
+  margin-left: 4px;
+  width: 130px;
+}
+.explor_box .content p {
+  margin: 6px 0;
+}
+.explor_box .name {
+  /* color: #fff; */
+  font-weight: 500;
+  white-space: nowrap;
+}
+.progress {
+  position: relative;
+  width: 120px;
+  height: 3px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.progress .value {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  font-size: 12px;
+}
+.progress .bar {
+  height: 100%;
+  background-color: #d3bc8d;
+}
+.explor_box .prestige {
+  color: #1e1f20;
+  background: #e9e5dc;
+  width: 88px;
+  border-radius: 2px;
+  padding: 3px 7px;
+}
+.homes_hidden {
+  display: none;
+}
+.logo {
+  font-size: 12px;
+  text-align: center;
+  color: #7994a7;
+}
+.copyright {
+  color: #4a5366;
+  text-shadow: 1px 1px 1px #ffffff;
+}
+/*# sourceMappingURL=role-explore.css.map */
