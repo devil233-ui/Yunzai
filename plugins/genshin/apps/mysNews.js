@@ -23,10 +23,10 @@ export class mysNews extends plugin {
           reg: "^(#米游社|#mys)(.*)",
           fnc: "mysSearch"
         },
-        {
-          reg: "(.*)(bbs.mihoyo.com|miyoushe.com)/ys(.*)/article(.*)",
-          fnc: "mysUrl"
-        },
+        // {
+        //   reg: "(.*)(bbs.mihoyo.com|miyoushe.com)/ys(.*)/article(.*)",
+        //   fnc: "mysUrl"
+        // },
         {
           reg: "^#?(原(神|石)|星(铁|琼)|崩坏三|崩三|水晶|绝区(零)|zzz|菲林)?(预估|盘点)$",
           fnc: "mysEstimate"
