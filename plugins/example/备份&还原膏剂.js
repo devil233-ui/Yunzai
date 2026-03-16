@@ -306,6 +306,7 @@ async function getGitUrls() {
     return urls
 }
 
+// 【修改点】批量下载插件 - 采用浅克隆优化
 function batchGitClone() {
     const backupUrlPath = path.join(bfPath, 'pluginurl.yaml')
     if (!fs.existsSync(backupUrlPath)) return []
@@ -316,10 +317,13 @@ function batchGitClone() {
         const target = path.join(pluginsPath, name)
         if (fs.existsSync(target)) continue
         try {
-            console.log(`正在克隆 ${name}...`)
-            execSync(`git clone "${url}" "${target}"`, { stdio: 'inherit' })
+            console.log(`正在浅克隆 ${name}...`)
+            // 【核心变化】添加了 --depth 1 参数
+            execSync(`git clone --depth 1 "${url}" "${target}"`, { stdio: 'inherit' })
             downloaded.push(name)
-        } catch (e) { console.error(e.message) }
+        } catch (e) { 
+            console.error(`[还原] 克隆 ${name} 失败: ${e.message}`) 
+        }
     }
     return downloaded
 }
