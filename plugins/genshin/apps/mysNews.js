@@ -12,7 +12,7 @@ export class mysNews extends plugin {
       name: "米游社公告",
       dsc: "#公告 #资讯 #活动",
       event: "message",
-      priority: -7000,
+      priority: -114514,
       rule: [
         {
           //逻辑：只能以 游戏前缀或游戏名 开头
@@ -41,7 +41,7 @@ export class mysNews extends plugin {
           fnc: "mysNewsTask"
         },
         {
-          reg: "^#(星铁|原神|绝区零)(开启|关闭)到期活动(预警)?(推送)?$",
+          reg: "^#(星铁|原神|崩三|绝区零|崩坏三|崩坏3)(开启|关闭)到期活动(预警)?(推送)?$",
           fnc: "setActivityPush"
         }
       ]
@@ -88,13 +88,23 @@ export class mysNews extends plugin {
     }
     let typeName
     let pushGame
-    if (this.e.msg.includes("星铁")) {
+    if (this.e.msg.includes("星铁")) 
+    {
       typeName = "srActivityPush"
       pushGame = "星铁"
-    } else if (this.e.msg.includes("绝区零")){
+    } 
+    else if (this.e.msg.includes("绝区零"))
+    {
       typeName = "zzzActivityPush"
       pushGame = "绝区零"
-    } else {
+    }
+    //else if (this.e.msg.includes("崩三"|"崩坏三"|"崩坏3"))
+    else if (/崩三|崩坏三|崩坏3/.test(this.e.msg))
+    {
+      typeName = "bbbActivityPush"
+      pushGame = "崩三"
+    }
+    else {
       typeName = "gsActivityPush"
       pushGame = "原神"
     }
