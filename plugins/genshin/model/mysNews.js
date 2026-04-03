@@ -440,7 +440,7 @@ export default class MysNews extends base {
     let hdlist = []
     let result = []
     for (let item of gshd.data.list[1].list) {
-      if (item.tag_label.includes("活动") && !item.title.includes("传说任务") && !item.title.includes("游戏公告")) hdlist.push(item)
+      if (item.type_label.includes("活动公告")) hdlist.push(item)
     }
     for (let item of hdlist) {
       let endDt = item.end_time
@@ -464,7 +464,7 @@ export default class MysNews extends base {
     let hdlist = []
     let result = []
     for (let item of srhd.data.pic_list[0].type_list[0].list) {
-      if (item.title) hdlist.push(item)
+      if (item.title.includes("活动") || item.type_label.includes("资讯")) hdlist.push(item)
     }
     for (let item of hdlist) {
       let endDt = item.end_time
@@ -488,7 +488,7 @@ export default class MysNews extends base {
     let hdlist = []
     let result = []
     for (let item of zzzhd.data.pic_list[0].type_list[0].list) {
-      if (item.title) hdlist.push(item)
+      if (item.title.includes("活动") || item.type_label.includes("资讯")) hdlist.push(item)
     }
     for (let item of hdlist) {
       let endDt = item.end_time
@@ -504,15 +504,22 @@ export default class MysNews extends base {
   async getBbbActivity() {
     let bbbhd
     try {
-      bbbhd = await fetch("https://announcement-api.mihoyo.com/common/nap_cn/announcement/api/getAnnList?game=nap&game_biz=nap_cn&lang=zh-cn&bundle_id=nap_cn&platform=pc&region=prod_gf_cn&level=60&uid=100000000")
+      // 换成仓库中记载的崩坏3专属 ann-api 域名和参数
+      bbbhd = await fetch("https://ann-api.mihoyo.com/common/bh3_cn/announcement/api/getAnnList?game=bh3&game_biz=bh3_cn&lang=zh-cn&bundle_id=bh3_cn&channel_id=14&level=88&platform=pc&region=bb01&uid=100000000")
       bbbhd = await bbbhd.json()
     } catch {
       return []
     }
     let hdlist = []
     let result = []
-    for (let item of bbbhd.data.pic_list[0].type_list[0].list) {
-      if (item.title) hdlist.push(item)
+    // 崩三的数据结构在 data.list 下，而不是 pic_list
+    if (bbbhd?.data?.list) {
+      for (let lst of bbbhd.data.list) {
+        if (!lst.list) continue
+        for (let item of lst.list) {
+          if (item.type_label.includes("活动") || item.title.includes("补给") ||item.title.includes("完成任务")) hdlist.push(item)
+        }
+      }
     }
     for (let item of hdlist) {
       let endDt = item.end_time

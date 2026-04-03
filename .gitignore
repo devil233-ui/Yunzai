@@ -11,3 +11,4 @@
 /dump.rdb
 /pnpm-lock.yaml
 /*.sh
+/core

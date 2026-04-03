@@ -200,6 +200,8 @@ export class update extends plugin {
     }
 
     uping = true
+    this.isUp = false
+    this.isPkgUp = false
     await this.runUpdate()
     for (let plugin of await fs.readdir("plugins")) {
       plugin = await this.getPlugin(plugin)
@@ -208,7 +210,11 @@ export class update extends plugin {
     }
 
     if (this.isPkgUp) await this.updatePackage()
-    if (this.isUp) this.restart()
+    if (this.isUp) {
+      this.restart()
+    } else if (this.quiet) {
+      await this.reply("检查完毕，全部插件均已是最新版本")
+    }
     uping = false
   }
 
