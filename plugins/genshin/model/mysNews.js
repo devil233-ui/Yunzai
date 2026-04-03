@@ -356,12 +356,20 @@ export default class MysNews extends base {
     }
     let gsActivityList = await this.getGsActivity()
     let srActivityList = await this.getSrActivity()
+    let bbbActivityList = await this.getBbbActivity()
+    let zzzActivityList = await this.getZzzActivity()
     let ActivityList = []
     for (let item of srActivityList) {
       ActivityList.push({ game: "sr", subtitle: item.title, banner: item.img, title: item.title, end_time: item.end_time })
     }
     for (let item of gsActivityList) {
       ActivityList.push({ game: "gs", subtitle: item.subtitle, banner: item.banner, title: item.title, end_time: item.end_time })
+    }
+    for (let item of bbbActivityList) {
+      ActivityList.push({ game: "bbb", subtitle: item.title, banner: item.img, title: item.title, end_time: item.end_time })
+    }
+    for (let item of zzzActivityList) {
+      ActivityList.push({ game: "zzz", subtitle: item.title, banner: item.img, title: item.title, end_time: item.end_time })
     }
     if (ActivityList.length === 0) return
     for (let item of BotidList) {
@@ -383,9 +391,13 @@ export default class MysNews extends base {
       for (let a of ActivityList) {
         if ((!pushGroupList.srActivityPush || !pushGroupList.srActivityPush[item] || !pushGroupList.srActivityPush[item].includes(redisapgl.GroupList[0])) && a.game === "sr") continue
         if ((!pushGroupList.gsActivityPush || !pushGroupList.gsActivityPush[item] || !pushGroupList.gsActivityPush[item].includes(redisapgl.GroupList[0])) && a.game === "gs") continue
+        if ((!pushGroupList.bbbActivityPush || !pushGroupList.bbbActivityPush[item] || !pushGroupList.bbbActivityPush[item].includes(redisapgl.GroupList[0])) && a.game === "bbb") continue
+        if ((!pushGroupList.zzzActivityPush || !pushGroupList.zzzActivityPush[item] || !pushGroupList.zzzActivityPush[item].includes(redisapgl.GroupList[0])) && a.game === "zzz") continue
         let pushGame
         if (a.game === "sr") pushGame = "星铁"
         if (a.game === "gs") pushGame = "原神"
+        if (a.game === "bbb") pushGame = "崩三"
+        if (a.game === "zzz") pushGame = "绝区零"
         let endDt = a.end_time
         endDt = endDt.replace(/\s/, "T")
         let todayt = new Date()
@@ -461,6 +473,54 @@ export default class MysNews extends base {
       endDt = new Date(endDt)
       let sydate = await this.calculateRemainingTime(todayt, endDt)
       if (sydate.days <= 1) result.push(item)
+    }
+    return result
+  }
+
+  async getZzzActivity() {
+    let zzzhd
+    try {
+      zzzhd = await fetch("https://announcement-api.mihoyo.com/common/nap_cn/announcement/api/getAnnList?game=nap&game_biz=nap_cn&lang=zh-cn&bundle_id=nap_cn&platform=pc&region=prod_gf_cn&level=60&uid=100000000")
+      zzzhd = await zzzhd.json()
+    } catch {
+      return []
+    }
+    let hdlist = []
+    let result = []
+    for (let item of zzzhd.data.pic_list[0].type_list[0].list) {
+      if (item.title) hdlist.push(item)
+    }
+    for (let item of hdlist) {
+      let endDt = item.end_time
+      endDt = endDt.replace(/\s/, "T")
+      let todayt = new Date()
+      endDt = new Date(endDt)
+      let sydate = await this.calculateRemainingTime(todayt, endDt)
+      if (sydate.days <= 7) result.push(item)
+    }
+    return result
+  }
+
+  async getBbbActivity() {
+    let bbbhd
+    try {
+      bbbhd = await fetch("https://announcement-api.mihoyo.com/common/nap_cn/announcement/api/getAnnList?game=nap&game_biz=nap_cn&lang=zh-cn&bundle_id=nap_cn&platform=pc&region=prod_gf_cn&level=60&uid=100000000")
+      bbbhd = await bbbhd.json()
+    } catch {
+      return []
+    }
+    let hdlist = []
+    let result = []
+    for (let item of bbbhd.data.pic_list[0].type_list[0].list) {
+      if (item.title) hdlist.push(item)
+    }
+    for (let item of hdlist) {
+      let endDt = item.end_time
+      endDt = endDt.replace(/\s/, "T")
+      let todayt = new Date()
+      endDt = new Date(endDt)
+      let sydate = await this.calculateRemainingTime(todayt, endDt)
+      if (sydate.days <= 7) result.push(item)
     }
     return result
   }
