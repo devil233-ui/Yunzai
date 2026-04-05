@@ -1,0 +1,11 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "get-urls": "*",
+    "moment-timezone": "*",
+    "tencentcloud-sdk-nodejs-lighthouse": "*",
+    "icqq": "0.6.10"
+  }
+}
