@@ -394,21 +394,6 @@ export default class MysNews extends base {
         let date = await this.getDate()
 
         for (let botId of BotidList) {
-            let redisKey = `Yz:apgl:${botId}`
-            let redisapgl = await redis.get(redisKey)
-            redisapgl = redisapgl ? JSON.parse(redisapgl) : null
-
-            if (!redisapgl || redisapgl.date !== date) {
-                redisapgl = { date, GroupList: ActivityPushYaml[botId] }
-            }
-
-            if (!Array.isArray(redisapgl.GroupList) || redisapgl.GroupList.length === 0) {
-                logger.mark(`[调试] Bot[${botId}] 今天的推送队列已空，跳过`)
-                continue
-            }
-
-            let groupId = redisapgl.GroupList[0]
-
             // 兼容 TRSS-Yunzai 获取 bot 实例
             let botInstance = Bot[botId] || Bot[Number(botId)]
             if (!botInstance && this.e && this.e.bot && (this.e.bot.uin == botId || this.e.bot.id == botId)) {
@@ -416,56 +401,68 @@ export default class MysNews extends base {
             }
 
             if (!botInstance) {
-                logger.mark(`[调试] 警告：无法获取 Bot[${botId}] 实例，请检查框架适配器情况。已临时跳过。`)
-                redisapgl.GroupList.shift()
-                await redis.set(redisKey, JSON.stringify(redisapgl))
+                logger.mark(`[调试] 警告：无法获取 Bot[${botId}] 实例，已跳过。`)
                 continue
             }
 
-            logger.mark(`[调试] 开始检查群 ${groupId} 需要推送的游戏...`)
+            let groupList = ActivityPushYaml[botId] || []
 
-            let pushSuccessCount = 0
-            for (let a of ActivityList) {
-                // 【关键修复】将两边全部强转为字符串，防止数值和字符串比对失败导致被拦截
-                let groupStr = String(groupId)
-                let isGs = pushGroupList.gsActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "gs"
-                let isSr = pushGroupList.srActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "sr"
-                let isBbb = pushGroupList.bbbActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "bbb"
-                let isZzz = pushGroupList.zzzActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "zzz"
+            // 遍历该 Bot 需要推送的所有群
+            for (let groupId of groupList) {
+                // 将 Redis 键精确到群： Yz:apgl:Bot号:群号
+                let redisKey = `Yz:apgl:${botId}:${groupId}`
+                let hasPushed = await redis.get(redisKey)
 
-                if (!isGs && !isSr && !isBbb && !isZzz) {
-                    continue // 该群未开启当前轮到游戏的推送
+                // 如果该群今天已经推送过，跳过，检查下一个群
+                if (hasPushed === date) continue
+
+                logger.mark(`[调试] 开始检查群 ${groupId} 需要推送的游戏...`)
+
+                let pushSuccessCount = 0
+                for (let a of ActivityList) {
+                    let groupStr = String(groupId)
+                    let isGs = pushGroupList.gsActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "gs"
+                    let isSr = pushGroupList.srActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "sr"
+                    let isBbb = pushGroupList.bbbActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "bbb"
+                    let isZzz = pushGroupList.zzzActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "zzz"
+
+                    if (!isGs && !isSr && !isBbb && !isZzz) {
+                        continue
+                    }
+
+                    let pushGame = { "sr": "星铁", "gs": "原神", "bbb": "崩三", "zzz": "绝区零" }[a.game]
+
+                    let endDt = new Date(a.end_time.replace(/\s/, "T"))
+                    let sydate = await this.calculateRemainingTime(new Date(), endDt)
+
+                    let msgList = [
+                        `【${pushGame}活动即将结束通知】`,
+                        `\n活动:${a.subtitle}`,
+                        segment.image(a.banner),
+                        `描述:${a.title}`,
+                        `\n活动剩余时间:${sydate.days}天${sydate.hours}小时${sydate.minutes}分钟${sydate.seconds}秒`,
+                        `\n活动结束时间:${a.end_time}`
+                    ]
+
+                    logger.mark(`[米游社活动到期推送] 开始推送 ${botId}:${groupId} [${pushGame}] ${a.subtitle}`)
+                    pushSuccessCount++
+
+                    await common.sleep(5000)
+                    botInstance.pickGroup(groupId).sendMsg(msgList)
+                        .then(() => { }).catch((err) => logger.error(`[米游社活动到期推送] 推送失败，错误信息${err}`))
                 }
 
-                let pushGame = { "sr": "星铁", "gs": "原神", "bbb": "崩三", "zzz": "绝区零" }[a.game]
+                if (pushSuccessCount === 0) {
+                    logger.mark(`[调试] 群 ${groupId} 没有符合该群配置的活动需要推送`)
+                }
 
-                let endDt = new Date(a.end_time.replace(/\s/, "T"))
-                let sydate = await this.calculateRemainingTime(new Date(), endDt)
+                // 推送完该群后，在 Redis 单独记录该群今天已推送，并设置 24 小时自动过期清理
+                await redis.set(redisKey, date, { EX: 3600 * 24 })
 
-                let msgList = [
-                    `【${pushGame}活动即将结束通知】`,
-                    `\n活动:${a.subtitle}`,
-                    segment.image(a.banner),
-                    `描述:${a.title}`,
-                    `\n活动剩余时间:${sydate.days}天${sydate.hours}小时${sydate.minutes}分钟${sydate.seconds}秒`,
-                    `\n活动结束时间:${a.end_time}`
-                ]
-
-                logger.mark(`[米游社活动到期推送] 开始推送 ${botId}:${groupId} [${pushGame}] ${a.subtitle}`)
-                pushSuccessCount++
-
-                await common.sleep(5000)
-                botInstance.pickGroup(groupId).sendMsg(msgList)
-                    .then(() => { }).catch((err) => logger.error(`[米游社活动到期推送] 推送失败，错误信息${err}`))
+                // 【防风控机制】单个 Bot 只要对一个群执行了推送逻辑，就立刻退出当前 Bot 的群组循环。
+                // 下一次被定时任务（或手动指令）触发时，会按顺序找到下一个没有推送过的群。
+                break
             }
-
-            if (pushSuccessCount === 0) {
-                logger.mark(`[调试] 群 ${groupId} 没有符合该群配置的活动需要推送`)
-            }
-
-            // 将该群从今天的推送队列移除
-            redisapgl.GroupList.shift()
-            await redis.set(redisKey, JSON.stringify(redisapgl))
         }
     }
 
