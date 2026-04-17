@@ -509,7 +509,13 @@ export default class MysNews extends base {
         let hdlist = []
         let result = []
         for (let item of srhd.data.pic_list[0].type_list[0].list) {
-            if (item.title.includes("活动") || item.type_label.includes("资讯") && !item.title.includes("签到") || item.type_label.includes("资讯") && !item.title.includes("PV")) hdlist.push(item)
+            if (
+                // 条件：(标题包含"活动") 或者 (标签包含"资讯" 并且 标题既不含"签到" 也不含"PV")
+                item.title?.includes("活动") ||
+                (item.type_label?.includes("资讯") && !item.title?.includes("签到") && !item.title?.includes("PV"))
+            )
+                hdlist.push(item)
+
         }
         for (let item of hdlist) {
             let endDt = item.end_time
@@ -559,12 +565,15 @@ export default class MysNews extends base {
         let hdlist = []
         let result = []
         if (bbbhd?.data?.list) {
-            for (let item of lst.list) {
-                // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
-                if ((item.type_label?.includes("活动") && item.title?.includes("补给")) || (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
-                    // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
-                    item.img = item.banner || item.img || ''
-                    hdlist.push(item)
+            for (let lst of bbbhd.data.list) {
+                if (!lst.list) continue
+                for (let item of lst.list) {
+                    // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
+                    if ((item.type_label?.includes("活动") && item.title?.includes("补给")) || (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
+                        // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
+                        item.img = item.banner || item.img || ''
+                        hdlist.push(item)
+                    }
                 }
             }
         }
