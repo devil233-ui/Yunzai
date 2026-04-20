@@ -148,7 +148,7 @@ export class user extends plugin {
 
   /** 未登录ck */
   async noLogin() {
-    this.reply("绑定Cookie失败\n请先【登录米游社】或【登录通行证】再获取Cookie")
+    this.reply('绑定Cookie失败\n请发送 #扫码登录，使用米游社扫码')
   }
 
   /** #ck代码 */
@@ -159,7 +159,7 @@ export class user extends plugin {
   /** ck帮助 */
   async ckHelp() {
     let set = gsCfg.getConfig("mys", "set")
-    await this.reply(`Cookie绑定配置教程：${set.cookieDoc}\n获取Cookie后【私聊发送】进行绑定`)
+    await this.reply(`请发送 #扫码登录，使用米游社扫码`)
   }
 
   /** 绑定ck */
