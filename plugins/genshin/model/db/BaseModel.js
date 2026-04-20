@@ -6,7 +6,11 @@ import cfg from "../../../../lib/config/config.js"
 if (cfg.db.dialect === "sqlite") await fs.mkdir(path.dirname(cfg.db.storage), { recursive: true })
 const sequelize = new Sequelize(cfg.db)
 
-await sequelize.authenticate()
+try {
+  await sequelize.authenticate()
+} catch (err) {
+  logger.error("数据库认证错误", err)
+}
 
 export default class BaseModel extends Model {
   static Types = DataTypes
