@@ -81,7 +81,7 @@ export default class GachaLog extends base {
             if (i <= 1) await common.sleep(500)
         }
         MakeMsg.push(tmpMsg)
-        MakeMsg.push(`\n UID：${this.uid} 抽卡记录更新完成，您还可回复\n【${this?.e?.isSr ? "*" : "#"}全部记录】统计全部抽卡数据\n【${this?.e?.isSr ? "*光锥" : "#武器"}记录】统计${this?.e?.isSr ? "星铁光锥" : "武器"}池数据\n【${this?.e?.isSr ? "*" : "#"}角色统计】按卡池统计数据\n【${this?.e?.isSr ? "*" : "#"}导出记录】导出记录数据\n\n【#设置全量更新抽卡记录开】用于修复在官方记录有效期内可能发生的数据错误(如出金抽数大于90)`)
+        MakeMsg.push(`\n UID：${this.uid} 抽卡记录更新完成，您还可回复\n【${this?.e?.isSr ? "*" : "#"}全部记录】统计全部抽卡数据\n【${this?.e?.isSr ? "*光锥/联动光锥" : "#武器"}记录】统计${this?.e?.isSr ? "星铁光锥" : "武器"}池数据\n【${this?.e?.isSr ? "*" : "#"}角色/联动统计】按卡池统计数据\n【${this?.e?.isSr ? "*" : "#"}导出记录】导出记录数据\n\n【#设置全量更新抽卡记录开】用于修复在官方记录有效期内可能发生的数据错误(如出金抽数大于90)`)
         await this.e.reply(MakeMsg)
 
         if (this.fetchFullLog) {
