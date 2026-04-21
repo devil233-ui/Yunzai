@@ -1,2 +1,2 @@
-import MysInfo from '../../../xhh/system/checkCode/gs.js'
+import MysInfo from "../../../xhh/system/checkCode/gs.js"
 export default MysInfo

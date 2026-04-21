@@ -389,7 +389,7 @@ export default class MysNews extends base {
             BotidList.push(botId)
         }
 
-        logger.mark(`[调试] 当前开启了推送配置的Bot: ${BotidList.join(', ')}`)
+        logger.mark(`[调试] 当前开启了推送配置的Bot: ${BotidList.join(", ")}`)
 
         let date = await this.getDate()
 
@@ -571,7 +571,7 @@ export default class MysNews extends base {
                     // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
                     if ((item.type_label?.includes("活动") && item.title?.includes("补给")) || (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
                         // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
-                        item.img = item.banner || item.img || ''
+                        item.img = item.banner || item.img || ""
                         hdlist.push(item)
                     }
                 }

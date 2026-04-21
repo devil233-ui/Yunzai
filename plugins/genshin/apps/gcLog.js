@@ -248,7 +248,7 @@ powershell iex(irm 'https://gitee.com/storyc/halo-file/raw/master/zzzLink-bxgb.p
     let msg = [];
     msg.push(segment.text(textMessage1));
     msg.push(segment.text(textMessage2));
-    if (msg) await this.reply(common.makeForwardMsg(e, msg, `抽卡帮助`));// 文本消息合并
+    if (msg) await this.reply(common.makeForwardMsg(e, msg, "抽卡帮助"));// 文本消息合并
     return true;
 }
 
@@ -256,7 +256,7 @@ powershell iex(irm 'https://gitee.com/storyc/halo-file/raw/master/zzzLink-bxgb.p
     let data = await new LogCount(this.e).count()
     if (!data) return
 
-    this.reply([await this.renderImg("genshin", `html/gacha/log-count`, data, { retType: "base64" }), this.button])
+    this.reply([await this.renderImg("genshin", "html/gacha/log-count", data, { retType: "base64" }), this.button])
   }
 
   async setFetchFullLog() {
