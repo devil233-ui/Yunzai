@@ -196,7 +196,7 @@ export default class GachaLog extends base {
         // 调用一次接口判断链接是否正确
         let logUrl = "https://public-operation-hk4e.mihoyo.com/gacha_info/api/getGachaLog?"
         /** 国际服 */
-        if (!["cn_gf01", "cn_qd01"].includes(param.region)) {
+        if (![ "cn_gf01", "cn_qd01" ].includes(param.region)) {
             logUrl = "https://public-operation-hk4e-sg.hoyoverse.com/gacha_info/api/getGachaLog?"
         }
 
@@ -209,17 +209,17 @@ export default class GachaLog extends base {
             end_id: 0,
             ...param
         }).toString()
-        const isLd = [21, 22].includes(param.gacha_type)
+        const isLd = [ 21, 22 ].includes(param.gacha_type)
         if (this.e.isSr) {
             if (isLd) {
                 logUrl = "https://public-operation-hkrpg.mihoyo.com/common/gacha_record/api/getLdGachaLog?"
-                if (!["prod_gf_cn", "prod_qd_cn"].includes(param.region)) {
+                if (![ "prod_gf_cn", "prod_qd_cn" ].includes(param.region)) {
                     logUrl =
                         "https://public-operation-hkrpg-sg.hoyoverse.com/common/gacha_record/api/getLdGachaLog?"
                 }
             } else {
                 logUrl = "https://public-operation-hkrpg.mihoyo.com/common/gacha_record/api/getGachaLog?"
-                if (!["prod_gf_cn", "prod_qd_cn"].includes(param.region)) {
+                if (![ "prod_gf_cn", "prod_qd_cn" ].includes(param.region)) {
                     logUrl =
                         "https://public-operation-hkrpg-sg.hoyoverse.com/common/gacha_record/api/getGachaLog?"
                 }
@@ -577,7 +577,7 @@ export default class GachaLog extends base {
             return false
         }
 
-        uidArr = uidArr.sort(function (a, b) {
+        uidArr = uidArr.sort(function(a, b) {
             return b.mtimeMs - a.mtimeMs
         })
 
@@ -752,7 +752,7 @@ export default class GachaLog extends base {
     }
 
     checkIsUp() {
-        if (["莫娜", "七七", "迪卢克", "琴", "姬子", "杰帕德", "彦卿", "白露", "瓦尔特", "克拉拉", "布洛妮娅"].includes(this.role.name)) {
+        if ([ "莫娜", "七七", "迪卢克", "琴", "姬子", "杰帕德", "彦卿", "白露", "瓦尔特", "克拉拉", "布洛妮娅" ].includes(this.role.name)) {
             return false
         }
         let role5join = {
@@ -899,7 +899,7 @@ export default class GachaLog extends base {
             minValue = 0
         }
 
-        if ([301, 11, 21].includes(type)) {
+        if ([ 301, 11, 21 ].includes(type)) {
             line = [
                 [
                     { lable: "未出五星", num: data.noFiveNum, unit: "抽" },
@@ -917,7 +917,7 @@ export default class GachaLog extends base {
             ]
         }
         // 常驻池
-        if ([200, 1].includes(type)) {
+        if ([ 200, 1 ].includes(type)) {
             line = [
                 [
                     { lable: "未出五星", num: data.noFiveNum, unit: "抽" },
@@ -935,7 +935,7 @@ export default class GachaLog extends base {
             ]
         }
         // 武器池
-        if ([302, 12, 22].includes(type)) {
+        if ([ 302, 12, 22 ].includes(type)) {
             line = [
                 [
                     { lable: "未出五星", num: data.noFiveNum, unit: "抽" },
@@ -953,7 +953,7 @@ export default class GachaLog extends base {
             ]
         }
         // 集录池
-        if ([500].includes(type)) {
+        if ([ 500 ].includes(type)) {
             line = [
                 [
                     { lable: "未出五星", num: data.noFiveNum, unit: "抽" },
@@ -971,7 +971,7 @@ export default class GachaLog extends base {
             ]
         }
         // 新手池
-        if ([100, 2].includes(type)) {
+        if ([ 100, 2 ].includes(type)) {
             line = [
                 [
                     { lable: "未出五星", num: data.noFiveNum, unit: "抽" },

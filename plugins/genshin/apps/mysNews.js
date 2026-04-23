@@ -121,7 +121,7 @@ export class mysNews extends plugin {
     } else {
       model = "关闭"
       msg += model
-      cfg[typeName][this.e.self_id] = lodash.difference(cfg[typeName][this.e.self_id], [this.e.group_id])
+      cfg[typeName][this.e.self_id] = lodash.difference(cfg[typeName][this.e.self_id], [ this.e.group_id ])
       if (lodash.isEmpty(cfg[typeName][this.e.self_id])) { delete cfg[typeName][this.e.self_id] }
     }
     let yaml = YAML.stringify(cfg)
@@ -145,10 +145,10 @@ export class mysNews extends plugin {
   }
 
   async mysEstimate() {
-    let args = ["原石统计汇总", 137101761] /* 数字为通行证ID 可更换 */
-    if (/星(琼|铁)/.test(this.e.msg)) { args = ["星琼统计汇总", 137101761] }
-    if (/绝区(零)|zzz|菲林/.test(this.e.msg)) { args = ["菲林统计汇总", 137101761] }
-    if (/崩坏三|崩三|水晶/.test(this.e.msg)) { args = ["水晶统计", 80216695] }
+    let args = [ "原石统计汇总", 137101761 ] /* 数字为通行证ID 可更换 */
+    if (/星(琼|铁)/.test(this.e.msg)) { args = [ "星琼统计汇总", 137101761 ] }
+    if (/绝区(零)|zzz|菲林/.test(this.e.msg)) { args = [ "菲林统计汇总", 137101761 ] }
+    if (/崩坏三|崩三|水晶/.test(this.e.msg)) { args = [ "水晶统计", 80216695 ] }
     /*  args = ['水晶量', 51369902]  */
     /* 自行选择水晶预估作者 */
     let data = await new MysNews(this.e).mysEstimate(...args)
@@ -201,7 +201,7 @@ export class mysNews extends plugin {
     } else {
       model = "关闭"
       msg += `${model}`
-      cfg[type][this.e.self_id] = lodash.difference(cfg[type][this.e.self_id], [this.e.group_id])
+      cfg[type][this.e.self_id] = lodash.difference(cfg[type][this.e.self_id], [ this.e.group_id ])
       if (lodash.isEmpty(cfg[type][this.e.self_id])) {
         delete cfg[type][this.e.self_id]
         // 如果cfg[type]也成为空对象，则删除cfg[type]

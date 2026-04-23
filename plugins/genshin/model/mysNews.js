@@ -157,7 +157,7 @@ export default class MysNews extends base {
                 emoticon = await this.mysEmoticon(gid)
             }
 
-            data.post.content = data.post.content.replace(/_\([^)]*\)/g, function (t, e) {
+            data.post.content = data.post.content.replace(/_\([^)]*\)/g, function(t, e) {
                 t = t.replace(/_\(|\)/g, "")
                 if (emoticon.has(t)) {
                     return `<img class="emoticon-image" src="${emoticon.get(t)}"/>`
@@ -167,7 +167,7 @@ export default class MysNews extends base {
             })
 
             const arrEntities = { lt: "<", gt: ">", nbsp: " ", amp: "&", quot: "\"" }
-            data.post.content = data.post.content.replace(/&(lt|gt|nbsp|amp|quot);/ig, function (all, t) {
+            data.post.content = data.post.content.replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
                 return arrEntities[t]
             })
         }
@@ -273,12 +273,12 @@ export default class MysNews extends base {
 
     replyMsg(img, title) {
         if (!Array.isArray(img)) {
-            img = [img]
+            img = [ img ]
         }
         if (!img || img.length <= 0) return false
-        if (title) img = [title, ...img]
+        if (title) img = [ title, ...img ]
         if (img.length <= 20) return img
-        return common.makeForwardMsg(this.e, [img])
+        return common.makeForwardMsg(this.e, [ img ])
     }
 
     async mysNewsTask() {
@@ -289,7 +289,7 @@ export default class MysNews extends base {
         // 最多同时推送两条
         this.maxNum = cfg.maxNum
 
-        for (let gid of [1, 2, 3, 4, 6, 8]) {
+        for (let gid of [ 1, 2, 3, 4, 6, 8 ]) {
             let type = gid == 1 ? "bbb" : gid == 2 ? "gs" : gid == 3 ? "bb" : gid == 4 ? "wd" : gid == 6 ? "sr" : "zzz"
 
             let news = []
@@ -308,7 +308,7 @@ export default class MysNews extends base {
 
             if (news.length <= 0) continue
 
-            news = lodash.orderBy(news, ["post_id"], ["asc"])
+            news = lodash.orderBy(news, [ "post_id" ], [ "asc" ])
 
             let now = Date.now() / 1000
 
@@ -375,7 +375,7 @@ export default class MysNews extends base {
         // 安全合并需要推送的机器ID和群组
         let BotidList = []
         let ActivityPushYaml = {}
-        let allGames = [pushGroupList.gsActivityPush, pushGroupList.srActivityPush, pushGroupList.bbbActivityPush, pushGroupList.zzzActivityPush]
+        let allGames = [ pushGroupList.gsActivityPush, pushGroupList.srActivityPush, pushGroupList.bbbActivityPush, pushGroupList.zzzActivityPush ]
         for (let gameCfg of allGames) {
             if (!gameCfg) continue
             for (let botId in gameCfg) {

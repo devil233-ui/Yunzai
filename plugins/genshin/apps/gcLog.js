@@ -256,7 +256,7 @@ powershell iex(irm 'https://gitee.com/storyc/halo-file/raw/master/zzzLink-bxgb.p
     let data = await new LogCount(this.e).count()
     if (!data) return
 
-    this.reply([await this.renderImg("genshin", "html/gacha/log-count", data, { retType: "base64" }), this.button])
+    this.reply([ await this.renderImg("genshin", "html/gacha/log-count", data, { retType: "base64" }), this.button ])
   }
 
   async setFetchFullLog() {

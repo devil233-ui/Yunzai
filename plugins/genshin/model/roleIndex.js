@@ -86,7 +86,7 @@ export default class RoleIndex extends base {
     }
 
     dealData(data) {
-        let [resIndex, resAbyss, resDetail, basicInfo] = data
+        let [ resIndex, resAbyss, resDetail, basicInfo ] = data
 
         let avatars = resDetail.avatars || []
         let roleArr = avatars
@@ -213,8 +213,8 @@ export default class RoleIndex extends base {
         let explor = []
         let explor2 = []
 
-        let expArr = ["挪德卡莱", "纳塔", "枫丹", "须弥", "层岩巨渊"]
-        let expArr2 = ["渊下宫", "稻妻", "雪山", "璃月", "蒙德"]
+        let expArr = [ "挪德卡莱", "纳塔", "枫丹", "须弥", "层岩巨渊" ]
+        let expArr2 = [ "渊下宫", "稻妻", "雪山", "璃月", "蒙德" ]
 
         for (let val of expArr) {
             let tmp = {
@@ -239,11 +239,11 @@ export default class RoleIndex extends base {
 
         if (avatars.length > 0) {
             // 重新排序
-            avatars = lodash.chain(avatars).orderBy(["sortLevel"], ["desc"])
+            avatars = lodash.chain(avatars).orderBy([ "sortLevel" ], [ "desc" ])
             if (this.e.msg.includes("角色")) {
                 avatars = avatars.slice(0, 12)
             }
-            avatars = avatars.orderBy(["sort"], ["desc"]).value()
+            avatars = avatars.orderBy([ "sort" ], [ "desc" ]).value()
         }
 
         // 深渊
@@ -293,7 +293,7 @@ export default class RoleIndex extends base {
         }
         totalStar = totalStar + "（" + star.join("-") + "）"
 
-        let dataName = ["damage", "take_damage", "defeat", "normal_skill", "energy_skill"]
+        let dataName = [ "damage", "take_damage", "defeat", "normal_skill", "energy_skill" ]
         let data = []
         let tmpRole = []
         for (let val of dataName) {
@@ -400,7 +400,7 @@ export default class RoleIndex extends base {
         let explor1 = []
         let explor2 = []
 
-        res.world_explorations = lodash.orderBy(res.world_explorations, ["id"], ["desc"])
+        res.world_explorations = lodash.orderBy(res.world_explorations, [ "id" ], [ "desc" ])
 
         for (let val of res.world_explorations) {
             val.name = this.areaName[val.id] ? this.areaName[val.id] : lodash.truncate(val.name, { length: 6 })
@@ -477,7 +477,7 @@ export default class RoleIndex extends base {
     }
 
     async roleExploreData(res) {
-        let [resIndex, basicInfo] = res
+        let [ resIndex, basicInfo ] = res
 
         let data = resIndex.role
         if (!data) {
@@ -582,11 +582,11 @@ export default class RoleIndex extends base {
             )
         }
 
-        resIndex.world_explorations = lodash.orderBy(resIndex.world_explorations, ["id"], ["desc"])
+        resIndex.world_explorations = lodash.orderBy(resIndex.world_explorations, [ "id" ], [ "desc" ])
 
         let explor = []
         for (let val of resIndex.world_explorations) {
-            if ([7, 11, 12, 13].includes(val.id)) continue
+            if ([ 7, 11, 12, 13 ].includes(val.id)) continue
 
             val.name = this.areaName[val.id] ? this.areaName[val.id] : lodash.truncate(val.name, { length: 6 })
 
@@ -602,15 +602,15 @@ export default class RoleIndex extends base {
 
             if (val.id == 10) tmp.line = []
 
-            if (["蒙德", "璃月", "稻妻", "须弥", "枫丹"].includes(val.name)) {
+            if ([ "蒙德", "璃月", "稻妻", "须弥", "枫丹" ].includes(val.name)) {
                 tmp.line.push({ name: "声望", text: `${val.level}级` })
             }
 
-            if ([6, 10].includes(val.id)) {
-                let oidArr = [7]
-                if (val.id == 10) oidArr = [13, 12, 11]
+            if ([ 6, 10 ].includes(val.id)) {
+                let oidArr = [ 7 ]
+                if (val.id == 10) oidArr = [ 13, 12, 11 ]
                 for (let oid of oidArr) {
-                    let underground = lodash.find(resIndex.world_explorations, function (o) {
+                    let underground = lodash.find(resIndex.world_explorations, function(o) {
                         return o.id == oid
                     })
                     if (underground) {
@@ -622,7 +622,7 @@ export default class RoleIndex extends base {
                 }
             }
 
-            if (["雪山", "稻妻", "层岩巨渊", "须弥", "枫丹", "沉玉谷", "纳塔", "空之神殿"].includes(val.name)) {
+            if ([ "雪山", "稻妻", "层岩巨渊", "须弥", "枫丹", "沉玉谷", "纳塔", "空之神殿" ].includes(val.name)) {
                 let offerName = val.offerings[0].name; // 提出来，省得每次都写一长串
 
                 if (offerName.includes("流明石")) {

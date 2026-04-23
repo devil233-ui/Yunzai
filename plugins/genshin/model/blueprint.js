@@ -43,7 +43,7 @@ export default class blueprint extends base {
   async getBody(data) {
     if (!data?.data?.list?.length) return false
     let newData = []
-    for (let item of data?.data?.list) {
+    for (let item of data?.data?.list || []) {
       newData.push({
         cnt: item.num * 1,
         id: item.id * 1

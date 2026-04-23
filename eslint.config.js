@@ -1,44 +1,54 @@
 import js from "@eslint/js";
 import globals from "globals";
-// 删除用不到的 defineConfig 导入
-// import { defineConfig } from "eslint/config";
 
 export default [
     {
-        ignores: ["**/*.min.js", "resources/**/*.js"]
+        // 对应原配置的 ignorePatterns
+        ignores: ["**/*.min.js"]
     },
-    // 1. 官方推荐配置放前面作为基础
     js.configs.recommended,
     {
         languageOptions: {
+            // 对应原配置的 parserOptions
+            ecmaVersion: "latest",
+            sourceType: "module",
+            // 对应原配置的 env 和 globals
             globals: {
                 ...globals.node,
-                // 2. 告诉 ESLint 这些是 Yunzai 自带的全局变量，设为只读不报错
-                plugin: "readonly",
-                segment: "readonly",
+                ...globals.es2021,
+                ...globals.browser,
+                jQuery: "readonly",
                 Bot: "readonly",
+                redis: "readonly",
                 logger: "readonly",
-                common: "readonly",
-                redis: "readonly"
+                plugin: "readonly",
+                Renderer: "readonly",
+                segment: "readonly"
             }
         },
         rules: {
-            // 强制使用双引号，如果不一致就报错（--fix 会自动把它改成双引号）
+            // 原配置的基础核心规则，强制要求双引号
+            "multiline-ternary": "off",
+            "new-cap": "off",
+            "eqeqeq": "off",
+            "prefer-const": "off",
+            "arrow-body-style": "off",
+            "camelcase": "off",
+            "no-labels": ["error", { "allowLoop": true }],
             "quotes": ["error", "double"],
-            // 3. 放宽“定义了未使用”的严格检查
-            "no-unused-vars": [
-                "warn", // 降级为警告（终端里变黄而不是变红报错中断）
-                {
-                    "argsIgnorePattern": "^(e|_.*)$", // 忽略参数名为 e 或以下划线开头的变量
-                    "varsIgnorePattern": "^_.*$"      // 忽略变量名以下划线开头的变量（比如 _path）
-                }
-            ]
+            "quote-props": ["error", "consistent"],
+            "no-eval": ["error", { "allowIndirect": true }],
+            "array-bracket-newline": ["error", { "multiline": true }],
+            "array-bracket-spacing": ["error", "always"],
+            "space-before-function-paren": ["error", "never"],
+            "no-invalid-this": "off",
+            "no-case-declarations": "off",
+            "no-prototype-builtins": "off",
+            "no-undef": "off",
+            "no-unused-vars": "off",
+            "no-useless-assignment": "off",
+            "no-empty": "off",
+            "no-unassigned-vars": "off"
         }
     }
 ];
-
-// 删除了第二个冲突的 export default，前面的配置已经包含了这些功能。
-// export default defineConfig([
-//   { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.node } },
-// ]);
-
