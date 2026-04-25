@@ -30,7 +30,7 @@ body {
   padding-left: 10px;
 }
 .head_box {
-  margin: 10px 0px;
+  margin: 40px 0 25px;
   padding: 0px 27px;
   display: flex;
 }
@@ -40,6 +40,7 @@ body {
   border: 2px solid #d3bc8e;
 }
 .info_box {
+  margin-top: 5px;
   align-content: space-around;
 }
 .head_box .id_text {
@@ -86,9 +87,9 @@ body {
 }
 .head_box .genshin_logo {
   position: absolute;
-  top: 10px;
+  top: 20px;
   right: 143px;
-  width: 97px;
+  width: 110px;
 }
 .other_box {
   position: relative;
@@ -330,6 +331,12 @@ body {
 }
 .explor_box .item[data-name="挪德卡莱"] {
   background-color: rgb(75, 86, 129);
+}
+.explor_box .item[data-name="风息山"] {
+  background-color: rgb(74, 100, 92);
+}
+.explor_box .item[data-name="空之神殿"] {
+  background-color: rgb(68, 82, 111);
 }
 .explor_box .icon {
   width: 62px;
