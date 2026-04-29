@@ -569,7 +569,7 @@ export default class MysNews extends base {
                 if (!lst.list) continue
                 for (let item of lst.list) {
                     // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
-                    if ((item.type_label?.includes("活动") && item.title?.includes("补给")) || (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
+                    if ( (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
                         // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
                         item.img = item.banner || item.img || ""
                         hdlist.push(item)
@@ -578,7 +578,7 @@ export default class MysNews extends base {
             }
         }
 
-        logger.mark(`[调试] 崩三共抓取到活动: ${hdlist.length} 个`)
+        // logger.mark(`[调试] 崩三共抓取到活动: ${hdlist.length} 个`)
 
         for (let item of hdlist) {
             if (!item.end_time) continue
@@ -589,7 +589,7 @@ export default class MysNews extends base {
             if (endDt - todayt > 0 && sydate.days <= 5) result.push(item)
         }
 
-        logger.mark(`[调试] 崩三符合到期条件的有: ${result.length} 个`)
+        // logger.mark(`[调试] 崩三符合到期条件的有: ${result.length} 个`)
         return result
     }
 
