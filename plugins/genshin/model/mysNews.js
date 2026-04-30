@@ -539,7 +539,7 @@ export default class MysNews extends base {
         let hdlist = []
         let result = []
         for (let item of zzzhd.data.pic_list[0].type_list[0].list) {
-            if (item.title.includes("活动")  || item.type_label.includes("资讯")) hdlist.push(item)
+            if (item.title?.includes("活动") || item.type_label?.includes("资讯") && !item.title?.includes("主线")) hdlist.push(item)
         }
         for (let item of hdlist) {
             let endDt = item.end_time
