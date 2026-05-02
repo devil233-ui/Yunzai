@@ -157,7 +157,7 @@ export default class MysNews extends base {
                 emoticon = await this.mysEmoticon(gid)
             }
 
-            data.post.content = data.post.content.replace(/_\([^)]*\)/g, function(t, e) {
+            data.post.content = data.post.content.replace(/_\([^)]*\)/g, function (t, e) {
                 t = t.replace(/_\(|\)/g, "")
                 if (emoticon.has(t)) {
                     return `<img class="emoticon-image" src="${emoticon.get(t)}"/>`
@@ -167,7 +167,7 @@ export default class MysNews extends base {
             })
 
             const arrEntities = { lt: "<", gt: ">", nbsp: " ", amp: "&", quot: "\"" }
-            data.post.content = data.post.content.replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+            data.post.content = data.post.content.replace(/&(lt|gt|nbsp|amp|quot);/ig, function (all, t) {
                 return arrEntities[t]
             })
         }
@@ -273,12 +273,12 @@ export default class MysNews extends base {
 
     replyMsg(img, title) {
         if (!Array.isArray(img)) {
-            img = [ img ]
+            img = [img]
         }
         if (!img || img.length <= 0) return false
-        if (title) img = [ title, ...img ]
+        if (title) img = [title, ...img]
         if (img.length <= 20) return img
-        return common.makeForwardMsg(this.e, [ img ])
+        return common.makeForwardMsg(this.e, [img])
     }
 
     async mysNewsTask() {
@@ -289,7 +289,7 @@ export default class MysNews extends base {
         // 最多同时推送两条
         this.maxNum = cfg.maxNum
 
-        for (let gid of [ 1, 2, 3, 4, 6, 8 ]) {
+        for (let gid of [1, 2, 3, 4, 6, 8]) {
             let type = gid == 1 ? "bbb" : gid == 2 ? "gs" : gid == 3 ? "bb" : gid == 4 ? "wd" : gid == 6 ? "sr" : "zzz"
 
             let news = []
@@ -308,7 +308,7 @@ export default class MysNews extends base {
 
             if (news.length <= 0) continue
 
-            news = lodash.orderBy(news, [ "post_id" ], [ "asc" ])
+            news = lodash.orderBy(news, ["post_id"], ["asc"])
 
             let now = Date.now() / 1000
 
@@ -375,7 +375,7 @@ export default class MysNews extends base {
         // 安全合并需要推送的机器ID和群组
         let BotidList = []
         let ActivityPushYaml = {}
-        let allGames = [ pushGroupList.gsActivityPush, pushGroupList.srActivityPush, pushGroupList.bbbActivityPush, pushGroupList.zzzActivityPush ]
+        let allGames = [pushGroupList.gsActivityPush, pushGroupList.srActivityPush, pushGroupList.bbbActivityPush, pushGroupList.zzzActivityPush]
         for (let gameCfg of allGames) {
             if (!gameCfg) continue
             for (let botId in gameCfg) {
@@ -409,18 +409,20 @@ export default class MysNews extends base {
 
             // 遍历该 Bot 需要推送的所有群
             for (let groupId of groupList) {
-                // 将 Redis 键精确到群： Yz:apgl:Bot号:群号
-                let redisKey = `Yz:apgl:${botId}:${groupId}`
-                let hasPushed = await redis.get(redisKey)
-
-                // 如果该群今天已经推送过，跳过，检查下一个群
-                if (hasPushed === date) continue
+                let groupStr = String(groupId)
+                let pushSuccessCount = 0
+                let shouldBreak = false // 记录本轮是否发过消息
 
                 logger.mark(`[调试] 开始检查群 ${groupId} 需要推送的游戏...`)
 
-                let pushSuccessCount = 0
                 for (let a of ActivityList) {
-                    let groupStr = String(groupId)
+                    // 【核心优化】把 Redis 缓存精确到单独的游戏： Yz:apgl:游戏简称:Bot号:群号
+                    let redisKey = `Yz:apgl:${a.game}:${botId}:${groupId}`
+                    let hasPushed = await redis.get(redisKey)
+
+                    // 如果这个游戏今天已经给这个群推过了，就跳过它，检查下一个游戏
+                    if (hasPushed === date) continue
+
                     let isGs = pushGroupList.gsActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "gs"
                     let isSr = pushGroupList.srActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "sr"
                     let isBbb = pushGroupList.bbbActivityPush?.[botId]?.map(String).includes(groupStr) && a.game === "bbb"
@@ -431,7 +433,6 @@ export default class MysNews extends base {
                     }
 
                     let pushGame = { "sr": "星铁", "gs": "原神", "bbb": "崩三", "zzz": "绝区零" }[a.game]
-
                     let endDt = new Date(a.end_time.replace(/\s/, "T"))
                     let sydate = await this.calculateRemainingTime(new Date(), endDt)
 
@@ -446,22 +447,24 @@ export default class MysNews extends base {
 
                     logger.mark(`[米游社活动到期推送] 开始推送 ${botId}:${groupId} [${pushGame}] ${a.subtitle}`)
                     pushSuccessCount++
+                    shouldBreak = true // 标记今天对这个群发过言了
 
                     await common.sleep(5000)
                     botInstance.pickGroup(groupId).sendMsg(msgList)
                         .then(() => { }).catch((err) => logger.error(`[米游社活动到期推送] 推送失败，错误信息${err}`))
+
+                    // 仅对当前推送成功的游戏打上日期戳
+                    await redis.set(redisKey, date, { EX: 3600 * 24 })
                 }
 
                 if (pushSuccessCount === 0) {
-                    logger.mark(`[调试] 群 ${groupId} 没有符合该群配置的活动需要推送`)
+                    logger.mark(`[调试] 群 ${groupId} 没有需要推送的新活动`)
                 }
 
-                // 推送完该群后，在 Redis 单独记录该群今天已推送，并设置 24 小时自动过期清理
-                await redis.set(redisKey, date, { EX: 3600 * 24 })
-
-                // 【防风控机制】单个 Bot 只要对一个群执行了推送逻辑，就立刻退出当前 Bot 的群组循环。
-                // 下一次被定时任务（或手动指令）触发时，会按顺序找到下一个没有推送过的群。
-                break
+                if (shouldBreak) {
+                    // 防风控：如果刚才发过消息了，立刻退出循环，剩下的群等下一次定时任务触发
+                    break
+                }
             }
         }
     }
@@ -539,7 +542,10 @@ export default class MysNews extends base {
         let hdlist = []
         let result = []
         for (let item of zzzhd.data.pic_list[0].type_list[0].list) {
-            if (item.title?.includes("活动") || item.type_label?.includes("资讯") && !item.title?.includes("主线") || item.type_label?.includes("资讯") && !item.title?.includes("上新")) hdlist.push(item)
+            if (
+                item.title?.includes("活动") ||
+                (item.type_label?.includes("资讯") && !item.title?.includes("主线") && !item.title?.includes("上新"))
+            ) hdlist.push(item)
         }
         for (let item of hdlist) {
             let endDt = item.end_time
@@ -569,7 +575,7 @@ export default class MysNews extends base {
                 if (!lst.list) continue
                 for (let item of lst.list) {
                     // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
-                    if ( (item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
+                    if ((item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
                         // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
                         item.img = item.banner || item.img || ""
                         hdlist.push(item)
