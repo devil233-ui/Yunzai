@@ -559,24 +559,40 @@ export default class MysNews extends base {
     }
 
     async getBbbActivity() {
-        let bbbhd
-        try {
-            bbbhd = await fetch("https://ann-api.mihoyo.com/common/bh3_cn/announcement/api/getAnnList?game=bh3&game_biz=bh3_cn&lang=zh-cn&bundle_id=bh3_cn&channel_id=14&level=88&platform=pc&region=bb01&uid=100000000")
-            bbbhd = await bbbhd.json()
-        } catch (e) {
-            logger.error("[崩三API请求报错] ", e)
+        let bbbhd;
+        let fetchSuccess = false;
+
+        // 尝试请求最多 3 次，防止海外服务器连接国内直连节点超时抽风
+        for (let i = 0; i < 3; i++) {
+            try {
+                // node-fetch 支持直接传入 timeout 参数（单位毫秒）
+                let res = await fetch("https://ann-api.mihoyo.com/common/bh3_cn/announcement/api/getAnnList?game=bh3&game_biz=bh3_cn&lang=zh-cn&bundle_id=bh3_cn&channel_id=14&level=88&platform=pc&region=bb01&uid=100000000", {
+                    timeout: 8000 // 8秒连不上直接切断，进入重试
+                })
+                bbbhd = await res.json()
+                fetchSuccess = true
+                break // 请求成功，立刻跳出重试循环
+            } catch (e) {
+                logger.mark(`[网络波动] 崩三API 第 ${i + 1} 次请求超时，正在重试...`)
+                await common.sleep(2000) // 延迟2秒后重试
+            }
+        }
+
+        // 如果 3 次全失败，安全退出，返回空数组，不影响后续其他游戏的推送
+        if (!fetchSuccess) {
+            logger.error("[崩三API报错] 连续3次请求超时，海外服务器直连国内节点受阻，放弃本次获取。")
             return []
         }
 
         let hdlist = []
         let result = []
+
+        // 崩三的数据结构在 data.list 下，需要两层循环提取
         if (bbbhd?.data?.list) {
             for (let lst of bbbhd.data.list) {
                 if (!lst.list) continue
                 for (let item of lst.list) {
-                    // 修复：1.将按位与运算 & 改为逻辑与 &&；2.加上 ?. 防止 type_label 字段不存在导致报错中断
-                    if ((item.type_label?.includes("活动") && item.title?.includes("完成任务"))) {
-                        // 崩三接口通常使用 banner 字段而不是 img，统一赋值防止推送时获取不到图片
+                    if (item.type_label?.includes("活动") && !item.title?.includes("公告")) {
                         item.img = item.banner || item.img || ""
                         hdlist.push(item)
                     }
@@ -584,18 +600,14 @@ export default class MysNews extends base {
             }
         }
 
-        // logger.mark(`[调试] 崩三共抓取到活动: ${hdlist.length} 个`)
-
         for (let item of hdlist) {
             if (!item.end_time) continue
             let endDt = item.end_time.replace(/\s/, "T")
             let todayt = new Date()
             endDt = new Date(endDt)
             let sydate = await this.calculateRemainingTime(todayt, endDt)
-            if (endDt - todayt > 0 && sydate.days <= 5) result.push(item)
+            if (endDt - todayt > 0 && sydate.days <= 7) result.push(item)
         }
-
-        // logger.mark(`[调试] 崩三符合到期条件的有: ${result.length} 个`)
         return result
     }
 
