@@ -488,7 +488,7 @@ export default class MysNews extends base {
         let hdlist = []
         let result = []
         for (let item of gshd.data.list[1].list) {
-            if (item.type_label.includes("活动公告") && !item.title?.includes("冒险助力礼包")) hdlist.push(item)
+            if (item.type_label.includes("活动公告") && !item.title?.includes("冒险助力礼包") && !item.title?.includes("七圣")) hdlist.push(item)
         }
         for (let item of hdlist) {
             let endDt = item.end_time
@@ -592,7 +592,7 @@ export default class MysNews extends base {
             for (let lst of bbbhd.data.list) {
                 if (!lst.list) continue
                 for (let item of lst.list) {
-                    if (item.type_label?.includes("活动") && !item.title?.includes("公告")) {
+                    if ( (item.type_label?.includes("活动") && !item.title?.includes("补给") && !item.title?.includes("跃升武装") && !item.title?.includes("礼包") && !item.title?.includes("凭证") && !item.title?.includes("七日登录"))) {
                         item.img = item.banner || item.img || ""
                         hdlist.push(item)
                     }
