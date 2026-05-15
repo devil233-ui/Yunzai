@@ -37,7 +37,7 @@
     "puppeteer": "^13.7",
     "redis": "^4.7.1",
     "sequelize": "^6.37.8",
-    "sqlite3": "npm:@karinjs/sqlite3@^0.4.3",
+    "sqlite3": "^5.1.7",
     "strip-ansi": "^7.2.0",
     "ulid": "^3.0.2",
     "ws": "^8.21.0",
