@@ -3,6 +3,7 @@
 /logs
 /node_modules
 /plugins/*
+/data/*
 !/plugins/adapter
 !/plugins/system
 !/plugins/other
