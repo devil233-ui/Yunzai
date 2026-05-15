@@ -1,19 +1,12 @@
 import js from "@eslint/js";
 import globals from "globals";
+import gitignore from "eslint-config-flat-gitignore";
 
 export default [
+    gitignore(), // 读取 .gitignore 的规则
     {
-        // 对应原配置的 ignorePatterns
-        ignores: [
-            "**/*.min.js",
-            "node_modules/**",
-            "data/**",
-            "logs/**",
-            "temp/**",
-            "plugins/*/data/**",
-            "plugins/*/temp/**",
-            "**/*.min.js"
-        ]
+        // 再补充一些 ESLint 专属的忽略名单
+        ignores: [ "**/*.min.js" ] 
     },
     js.configs.recommended,
     {
@@ -43,13 +36,13 @@ export default [
             "prefer-const": "off",
             "arrow-body-style": "off",
             "camelcase": "off",
-            "no-labels": ["error", { "allowLoop": true }],
-            "quotes": ["error", "double"],
-            "quote-props": ["error", "consistent"],
-            "no-eval": ["error", { "allowIndirect": true }],
-            "array-bracket-newline": ["error", { "multiline": true }],
-            "array-bracket-spacing": ["error", "always"],
-            "space-before-function-paren": ["error", "never"],
+            "no-labels": [ "error", { "allowLoop": true } ],
+            "quotes": [ "error", "double" ],
+            "quote-props": [ "error", "consistent" ],
+            "no-eval": [ "error", { "allowIndirect": true } ],
+            "array-bracket-newline": [ "error", { "multiline": true } ],
+            "array-bracket-spacing": [ "error", "always" ],
+            "space-before-function-paren": [ "error", "never" ],
             "no-invalid-this": "off",
             "no-case-declarations": "off",
             "no-prototype-builtins": "off",
