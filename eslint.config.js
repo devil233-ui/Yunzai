@@ -4,7 +4,16 @@ import globals from "globals";
 export default [
     {
         // 对应原配置的 ignorePatterns
-        ignores: ["**/*.min.js"]
+        ignores: [
+            "**/*.min.js",
+            "node_modules/**",
+            "data/**",
+            "logs/**",
+            "temp/**",
+            "plugins/*/data/**",
+            "plugins/*/temp/**",
+            "**/*.min.js"
+        ]
     },
     js.configs.recommended,
     {
