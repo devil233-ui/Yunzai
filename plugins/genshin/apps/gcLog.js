@@ -3,6 +3,7 @@ import plugin from "../../../lib/plugins/plugin.js"
 import GachaLog from "../model/gachaLog.js"
 import LogCount from "../model/logCount.js"
 import ExportLog from "../model/exportLog.js"
+import common from "../../../lib/common/common.js"
 
 const _path = process.cwd() + "/plugins/genshin"
 
@@ -12,7 +13,7 @@ export class gcLog extends plugin {
       name: "抽卡记录",
       dsc: "抽卡记录数据统计",
       event: "message",
-      priority: 300,
+      priority: -11451415,
       rule: [
         {
           reg: "(.*)authkey=(.*)",
@@ -155,15 +156,12 @@ export class gcLog extends plugin {
 
   async help(e) {
     let textMessage1 =
-        `最下面有详细方法
+        `如已扫过码请先尝试【#刷新ck】，否则【#扫码登录】
 【原神】
-发送【#扫码登录】，米游社扫码，然后 发送 【#更新抽卡记录】，【#更新小助手抽卡记录】 等待，发送  #全部记录，#抽卡记录
+发送【#更新抽卡记录】
 
-【崩坏：星穹铁道】【下方 提供方法指路，是否使用自己判断】
-星铁抽卡记录：不能直接更新记录，需要自己提取。可以使用  手机软件、电脑获取、第三方米哈游启动器  获取链接
-
-【绝区零】
-发送【#扫码登录】，米游社扫码，然后 发送 【%更新抽卡记录】  等待，发送  %抽卡记录
+【崩坏：星穹铁道】
+官方未公开接口，不能直接更新记录，需要自己提取。可使用以下方式获取链接后私发bot：
 
 手机软件：
 https://www.wyylkjs.top/HoYoGet/
@@ -175,6 +173,10 @@ https://feixiaoqiu.com/n/#/xt/gacha_link
 https://github.com/biuuu/star-rail-warp-export
 第三方米哈游启动器
 https://github.com/Scighost/Starward
+
+
+【绝区零】
+发送【%更新抽卡记录】，等待获取后发送【%抽卡记录】
 `;
     let textMessage2 = `    
 【记录帮助-安卓】
@@ -246,8 +248,8 @@ powershell iex(irm 'https://gitee.com/storyc/halo-file/raw/master/zzzLink-bxgb.p
     4.抽卡分析的链接就在剪贴板了，粘贴即可
     `;
     let msg = [];
-    msg.push(segment.text(textMessage1));
-    msg.push(segment.text(textMessage2));
+    msg.push(textMessage1);
+    msg.push(textMessage2);
     if (msg) await this.reply(common.makeForwardMsg(e, msg, "抽卡帮助"));// 文本消息合并
     return true;
 }
