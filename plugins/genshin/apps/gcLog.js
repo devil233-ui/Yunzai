@@ -32,7 +32,7 @@ export class gcLog extends plugin {
           fnc: "exportLog"
         },
         {
-          reg: "^#?(记录帮助|抽卡帮助)$",
+          reg: /(记录帮助|抽卡帮助)$/,
           fnc: "help"
         },
         {

@@ -20,7 +20,8 @@
   <div class="type_box weekly-box">
     {{each weeklyList weekItem}}
     <div class="weekly-item">
-      {{set bossIconPath = pluResPath + `html/materialPack/img/weeklyBoss/${weekItem[0]}.png` }}
+      <!-- {{set bossIconPath = pluResPath + `html/materialPack/img/weeklyBoss/${weekItem[0]}.png` }} -->
+      {{set bossIconPath = weekItem[3] ? weekItem[3] : pluResPath + `html/materialPack/img/weeklyBoss/${weekItem[0]}.png` }}
       <div class="material">
         <img class="item-icon star5"/>
         <!--suppress CssUnknownTarget -->
