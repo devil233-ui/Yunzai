@@ -158,10 +158,11 @@ export class gcLog extends plugin {
     let textMessage1 =
         `如已扫过码请先尝试【#刷新ck】，否则【#扫码登录】
 【原神】
-发送【#更新抽卡记录】
+1.发送【#更新抽卡记录】
+2.导入本地文件：发送https://uigf.org/zh/ 标准json
 
 【崩坏：星穹铁道】
-官方未公开接口，不能直接更新记录，需要自己提取。可使用以下方式获取链接后私发bot：
+1.官方未公开接口，不能直接更新记录，需要自己提取。可使用以下方式获取链接后私发bot：
 
 手机软件：
 https://www.wyylkjs.top/HoYoGet/
@@ -174,9 +175,11 @@ https://github.com/biuuu/star-rail-warp-export
 第三方米哈游启动器
 https://github.com/Scighost/Starward
 
+2.导入本地文件：发送https://uigf.org/zh/ 标准json
 
 【绝区零】
-发送【%更新抽卡记录】，等待获取后发送【%抽卡记录】
+1.发送【%更新抽卡记录】，等待获取后发送【%抽卡记录】
+2.导入本地文件：#绝区零导入记录，然后发送https://uigf.org/zh/ 标准json
 `;
     let textMessage2 = `    
 【记录帮助-安卓】
