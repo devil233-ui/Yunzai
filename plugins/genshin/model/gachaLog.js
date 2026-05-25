@@ -6,10 +6,6 @@ import gsCfg from "./gsCfg.js"
 import base from "./base.js"
 import { Character, Weapon } from "#miao.models"
 
-const isSr = this?.e?.isSr;
-const p = isSr ? "*" : "#";
-const game = isSr ? "崩铁" : "原神";
-
 export default class GachaLog extends base {
     constructor(e) {
         super(e)
@@ -19,8 +15,8 @@ export default class GachaLog extends base {
 
         this.urlKey = `${this.prefix}url:`
         /** 绑定的uid */
-        this.uidKey = isSr ? `Yz:srJson:mys:qq-uid:${this.userId}` : `Yz:genshin:mys:qq-uid:${this.userId}`
-        this.path = isSr ? `./data/srJson/${this.e.user_id}/` : `./data/gachaJson/${this.e.user_id}/`
+        this.uidKey = this.e.isSr ? `Yz:srJson:mys:qq-uid:${this.userId}` : `Yz:genshin:mys:qq-uid:${this.userId}`
+        this.path = this.e.isSr ? `./data/srJson/${this.e.user_id}/` : `./data/gachaJson/${this.e.user_id}/`
 
         const gsPool = [
             { type: 301, typeName: "角色" },
@@ -73,7 +69,6 @@ export default class GachaLog extends base {
 
         /** 制作合并消息 */
         let MakeMsg = []
-        
         let tmpMsg = ""
         /** 按卡池更新记录 */
         for (let i in this.pool) {
@@ -86,6 +81,11 @@ export default class GachaLog extends base {
             if (i <= 1) await common.sleep(500)
         }
         MakeMsg.push(tmpMsg)
+
+        const isSr = this.e.isSr;
+        const p = isSr ? "*" : "#";
+        const game = isSr ? "崩铁" : "原神";
+
         MakeMsg.push(`\nUID：${this.uid}抽卡记录更新完成，您还可回复以下（注：除【全部】和【导出】指令外，前缀后均可加【常驻】或【联动】）\n\n【${p}全部记录】统计${game}全部抽卡数据\n【${p}角色记录】统计${game}角色数据（算垫的）\n【${p}武器记录】统计${game}武器数据（算垫的）\n【${p}角色统计】按卡池统计${game}角色数据（不算垫的）\n【${p}武器统计】按卡池统计${game}武器数据（不算垫的）\n【${p}导出记录】导出记录数据\n【#设置全量更新抽卡记录开】用于修复在官方记录有效期内可能发生的数据错误(如出金抽数大于90)`)
         await this.e.reply(MakeMsg)
 
@@ -133,13 +133,13 @@ export default class GachaLog extends base {
             let res = await this.logApi({
                 size: 6,
                 authkey: param.authkey,
-                region: isSr ? "prod_gf_cn" : "cn_gf01"
+                region: this.e.isSr ? "prod_gf_cn" : "cn_gf01"
             })
             if (!res?.data?.region) {
                 res = await this.logApi({
                     size: 6,
                     authkey: param.authkey,
-                    region: isSr ? "prod_official_usa" : "os_usa"
+                    region: this.e.isSr ? "prod_official_usa" : "os_usa"
                 })
             }
 
@@ -215,7 +215,7 @@ export default class GachaLog extends base {
             ...param
         }).toString()
         const isLd = [ 21, 22 ].includes(param.gacha_type)
-        if (isSr) {
+        if (this.e.isSr) {
             if (isLd) {
                 logUrl = "https://public-operation-hkrpg.mihoyo.com/common/gacha_record/api/getLdGachaLog?"
                 if (![ "prod_gf_cn", "prod_qd_cn" ].includes(param.region)) {
@@ -463,7 +463,7 @@ export default class GachaLog extends base {
             logData.push(data)
         }
         if (logData.length === 0) {
-            this.e.reply(`暂无抽卡记录\n${this.e?.p}记录帮助，查看配置说明`, false, { at: true })
+            this.e.reply(`暂无抽卡记录\n${this.e?.isSr ? "*" : "#"}记录帮助，查看配置说明`, false, { at: true })
             return true
         }
         for (let i of logData) {
@@ -496,23 +496,23 @@ export default class GachaLog extends base {
 
     getPool() {
         let msg = this.e.msg.replace(/#|抽卡|记录|祈愿|分析|池|原神|星铁|崩坏星穹铁道|铁道/g, "")
-        let type = isSr ? 11 : 301
+        let type = this.e.isSr ? 11 : 301
         let typeName = "角色"
         switch (msg) {
             case "up":
             case "抽卡":
             case "角色":
             case "抽奖":
-                type = isSr ? 11 : 301
+                type = this.e.isSr ? 11 : 301
                 typeName = "角色"
                 break
             case "常驻":
-                type = isSr ? 1 : 200
+                type = this.e.isSr ? 1 : 200
                 typeName = "常驻"
                 break
             case "武器":
-                type = isSr ? 12 : 302
-                typeName = isSr ? "光锥" : "武器"
+                type = this.e.isSr ? 12 : 302
+                typeName = this.e.isSr ? "光锥" : "武器"
                 break
             case "集录":
                 type = 500
@@ -532,7 +532,7 @@ export default class GachaLog extends base {
                 typeName = "光锥联动"
                 break
             case "新手":
-                type = isSr ? 2 : 100
+                type = this.e.isSr ? 2 : 100
                 typeName = "新手"
                 break
         }
@@ -543,20 +543,20 @@ export default class GachaLog extends base {
 
     async getUid() {
         if (!fs.existsSync(this.path)) {
-            this.e.reply(`暂无抽卡记录\n${this.e?.p}记录帮助，查看配置说明`, false, { at: true })
+            this.e.reply(`暂无抽卡记录\n${this.e?.isSr ? "*" : "#"}记录帮助，查看配置说明`, false, { at: true })
             return false
         }
 
         let logs = fs.readdirSync(this.path)
 
         if (lodash.isEmpty(logs)) {
-            this.e.reply(`暂无抽卡记录\n${this.e?.p}记录帮助，查看配置说明`, false, { at: true })
+            this.e.reply(`暂无抽卡记录\n${this.e?.isSr ? "*" : "#"}记录帮助，查看配置说明`, false, { at: true })
             return false
         }
 
         if (!this.uid) {
             this.e.at = false
-            this.uid = isSr ? this.e.user?._games?.sr?.uid : this.e.user?._games?.gs?.uid || await this.e.runtime.getUid(this.e) || await redis.get(this.uidKey)
+            this.uid = this?.e?.isSr ? this.e.user?._games?.sr?.uid : this.e.user?._games?.gs?.uid || await this.e.runtime.getUid(this.e) || await redis.get(this.uidKey)
         }
 
         /** 记录有绑定的uid */
@@ -567,7 +567,7 @@ export default class GachaLog extends base {
         /** 拿修改时间最后的uid */
         let uidArr = []
         for (let uid of logs) {
-            let json = isSr ? `${this.path}${uid}/11.json` : `${this.path}${uid}/301.json`
+            let json = this?.e?.isSr ? `${this.path}${uid}/11.json` : `${this.path}${uid}/301.json`
             if (!fs.existsSync(json)) {
                 continue
             }
@@ -880,7 +880,7 @@ export default class GachaLog extends base {
         const typeName = data.typeName || this.typeName
         const max = type === 12 || type === 22 || type === 302 ? 80 : 90
         let line = []
-        let weapon = isSr ? "光锥" : "武器"
+        let weapon = this.e.isSr ? "光锥" : "武器"
         // 最非，最欧
         let maxValue, minValue
 
@@ -916,7 +916,7 @@ export default class GachaLog extends base {
                     { lable: "未出四星", num: data.noFourNum, unit: "抽" },
                     { lable: "五星常驻", num: data.wai, unit: "个" },
                     { lable: "UP平均", num: data.isvalidNum, unit: "抽" },
-                    { lable: `UP花费${isSr ? "星琼" : "原石"}`, num: data.upYs, unit: "" },
+                    { lable: `UP花费${this?.e?.isSr ? "星琼" : "原石"}`, num: data.upYs, unit: "" },
                     { lable: "最欧", num: minValue, unit: "抽" }
                 ]
             ]
@@ -1019,18 +1019,18 @@ export default class GachaLog extends base {
         switch (String(this.uid).slice(0, -8)) {
             case "1":
             case "2":
-                return isSr ? "prod_gf_cn" : "cn_gf01" // 官服
+                return this.e.isSr ? "prod_gf_cn" : "cn_gf01" // 官服
             case "5":
-                return isSr ? "prod_qd_cn" : "cn_qd01" // B服
+                return this.e.isSr ? "prod_qd_cn" : "cn_qd01" // B服
             case "6":
-                return isSr ? "prod_official_usa" : "os_usa" // 美服
+                return this.e.isSr ? "prod_official_usa" : "os_usa" // 美服
             case "7":
-                return isSr ? "prod_official_euro" : "os_euro" // 欧服
+                return this.e.isSr ? "prod_official_euro" : "os_euro" // 欧服
             case "8":
             case "18":
-                return isSr ? "prod_official_asia" : "os_asia" // 亚服
+                return this.e.isSr ? "prod_official_asia" : "os_asia" // 亚服
             case "9":
-                return isSr ? "prod_official_cht" : "os_cht" // 港澳台服
+                return this.e.isSr ? "prod_official_cht" : "os_cht" // 港澳台服
         }
         return "cn_gf01"
     }
