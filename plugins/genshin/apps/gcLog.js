@@ -179,7 +179,7 @@ https://github.com/Scighost/Starward
 
 【绝区零】
 1.发送【%更新抽卡记录】，等待获取后发送【%抽卡记录】
-2.导入本地文件：#绝区零导入记录，然后发送https://uigf.org/zh/ 标准json
+2.导入本地文件：%导入记录，然后发送https://uigf.org/zh/ 标准json
 `;
     let textMessage2 = `    
 【记录帮助-安卓】
