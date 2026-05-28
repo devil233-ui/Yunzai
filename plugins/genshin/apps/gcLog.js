@@ -13,7 +13,7 @@ export class gcLog extends plugin {
       name: "抽卡记录",
       dsc: "抽卡记录数据统计",
       event: "message",
-      priority: -11451415,
+      priority: 500,
       rule: [
         {
           reg: "(.*)authkey=(.*)",
