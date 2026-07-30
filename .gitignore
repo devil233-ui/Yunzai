@@ -13,4 +13,6 @@
 /pnpm-lock.yaml
 /*.sh
 /core
+/nul
 /.eslintcache
+/*/.eslintcache
