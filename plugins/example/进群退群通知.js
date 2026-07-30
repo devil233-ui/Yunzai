@@ -12,7 +12,7 @@ export class newcomer extends plugin {
     if (this.e.user_id == this.e.self_id) return
 
     /** 定义入群欢迎内容 */
-    let msg = "欢迎新人！"
+    let msg = "欢迎新老人！"
     /** 冷却cd 30s */
     let cd = 30
 
