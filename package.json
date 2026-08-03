@@ -23,6 +23,7 @@
     "es-toolkit": "^1.49.0",
     "eslint": "^10.4.0",
     "express": "^5.2.1",
+    "express-art-template": "^1.0.1",
     "file-type": "^22.0.1",
     "https-proxy-agent": "^7.0.6",
     "image-size": "^2.0.2",
