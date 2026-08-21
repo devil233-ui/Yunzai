@@ -22,6 +22,7 @@ export default class Puppeteer extends Renderer {
     this.browser = false
     this.lock = false
     this.browserInitPromise = null
+    this.browserRestartPromise = null
     this.shoting = []
     /** 截图数达到时重启浏览器 避免生成速度越来越慢 */
     this.restartNum = 100
@@ -44,14 +45,21 @@ export default class Puppeteer extends Renderer {
       timeout: 120000,
       waitUntil: "networkidle2",
     }
+    this.newPageTimeout = config.newPageTimeout || 30000
   }
 
   /**
    * 初始化chromium
    */
   async browserInit() {
+    if (this.browserRestartPromise) return this.browserRestartPromise
     if (this.browserInitPromise) return this.browserInitPromise
-    if (this.browser) return this.browser
+    if (this.browser) {
+      try {
+        if (!this.browser.isConnected || this.browser.isConnected()) return this.browser
+      } catch {}
+      this.browser = false
+    }
     this.lock = true
     this.browserInitPromise = this.createBrowser()
     try {
@@ -122,7 +130,12 @@ export default class Puppeteer extends Renderer {
     }
 
     /** 监听Chromium实例是否断开 */
-    this.browser.on("disconnected", () => this.restart(true))
+    const browser = this.browser
+    browser.on("disconnected", () => {
+      if (this.browser !== browser) return
+      const restart = this.restart(true)
+      if (restart) restart.catch(err => logger.error("puppeteer Chromium 自动重启失败", err))
+    })
 
     return this.browser
   }
@@ -150,6 +163,60 @@ export default class Puppeteer extends Renderer {
     return mac
   }
 
+  async waitForImages(page, timeout, name) {
+    timeout = Number(timeout) || 10000
+    let timeoutId
+    const timeoutPromise = new Promise(resolve => {
+      timeoutId = setTimeout(() => resolve("timeout"), timeout)
+    })
+
+    try {
+      const result = await Promise.race([
+        page
+          .evaluate(async () => {
+            const urls = new Set()
+            const addUrl = value => {
+              if (typeof value !== "string") return
+              const match = value.match(/^url\((["\x27]?)(.*)\1\)$/)
+              const url = match?.[2]?.trim()
+              if (url && url !== "none") urls.add(url)
+            }
+
+            for (const element of document.querySelectorAll("*"))
+              addUrl(getComputedStyle(element).backgroundImage)
+            for (const image of document.images)
+              addUrl(image.currentSrc || image.src)
+
+            const waitForImage = url =>
+              new Promise(resolve => {
+                const image = new Image()
+                const imageTimer = setTimeout(resolve, 5000)
+                const done = () => {
+                  clearTimeout(imageTimer)
+                  resolve()
+                }
+                image.onload = done
+                image.onerror = done
+                image.src = url
+                if (image.complete) done()
+              })
+
+            await Promise.all([
+              document.fonts?.ready || Promise.resolve(),
+              ...[...urls].map(waitForImage),
+            ])
+          })
+          .catch(() => null),
+        timeoutPromise,
+      ])
+
+      if (result === "timeout")
+        logger.mark("[图片生成][" + name + "] 等待图片资源超过" + timeout + "ms，继续截图")
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
   /**
    * `chromium` 截图
    * @param name
@@ -163,6 +230,7 @@ export default class Puppeteer extends Renderer {
    * @param data.multiPage 是否分页截图，默认false
    * @param data.multiPageHeight 分页状态下页面高度，默认4000
    * @param data.pageGotoParams 页面goto时的参数
+   * @param data.waitForImages 等待页面图片和CSS背景资源的最长时间
    * @return img 不做segment包裹
    */
   async screenshot(name, data = {}) {
@@ -193,9 +261,24 @@ export default class Puppeteer extends Renderer {
     }
 
     try {
-      page = await this.browser.newPage()
+      let newPageTimer
+      try {
+        page = await Promise.race([
+          this.browser.newPage(),
+          new Promise((_, reject) => {
+            newPageTimer = setTimeout(
+              () => reject(new Error(`newPage timeout of ${this.newPageTimeout} ms exceeded`)),
+              this.newPageTimeout,
+            )
+          }),
+        ])
+      } finally {
+        if (newPageTimer) clearTimeout(newPageTimer)
+      }
       const pageGotoParams = { ...this.pageGotoParams, ...data.pageGotoParams }
       await page.goto(`file://${_path}${lodash.trim(savePath, ".")}`, pageGotoParams)
+      if (data.waitForImages)
+        await this.waitForImages(page, data.waitForImages, name)
       const body = (await page.$("#container")) || (await page.$("body"))
 
       // 计算页面高度
@@ -266,7 +349,8 @@ export default class Puppeteer extends Renderer {
     } catch (err) {
       logger.error(`[图片生成][${name}] 图片生成失败`, err)
       /** 关闭浏览器 */
-      this.restart(true)
+      const restart = this.restart(true)
+      if (restart) await restart.catch(err => logger.error("puppeteer Chromium 重启失败", err))
       ret = []
       return false
     } finally {
@@ -287,13 +371,23 @@ export default class Puppeteer extends Renderer {
 
   /** 重启 */
   restart(force = false) {
+    if (this.browserRestartPromise) return this.browserRestartPromise
     /** 截图超过重启数时，自动关闭重启浏览器，避免生成速度越来越慢 */
     if (!this.browser?.close || this.lock) return
     if (!force) if (this.renderNum % this.restartNum !== 0 || this.shoting.length > 0) return
     logger.info(`puppeteer Chromium ${force ? "强制" : ""}关闭重启...`)
     const browser = this.browser
     this.browser = false
-    return this.stop(browser).then(() => this.browserInit())
+    const restartPromise = this.stop(browser).then(() => {
+      if (this.browserRestartPromise === restartPromise) this.browserRestartPromise = null
+      return this.browserInit()
+    })
+    this.browserRestartPromise = restartPromise
+    restartPromise.catch(err => {
+      logger.error("puppeteer Chromium 重启失败", err)
+      if (this.browserRestartPromise === restartPromise) this.browserRestartPromise = null
+    })
+    return restartPromise
   }
 
   async stop(browser) {
