@@ -14,9 +14,7 @@ const DATA_BACKUP_PLUGINS = []
 
 // 2. 【自定义备份列表】
 const CUSTOM_BACKUP_LIST = [
-    'plugins/Atlas/Genshin-Atlas/othername',
-    'plugins/Atlas/star-rail-atlas/othername',
-    'plugins/Atlas/zzz-atlas/othername'
+  'plugins/Atlas/resource/Forlibrary'
 ]
 
 // 3. 【忽略名单】

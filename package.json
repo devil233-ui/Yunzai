@@ -22,6 +22,7 @@
     "compression": "^1.8.1",
     "es-toolkit": "^1.49.0",
     "eslint": "^10.4.0",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-art-template": "^1.0.1",
     "file-type": "^22.0.1",
@@ -34,6 +35,7 @@
     "moment": "^2.30.1",
     "node-fetch": "link:lib/modules/node-fetch",
     "node-schedule": "^2.1.1",
+    "nodemailer": "^9.0.5",
     "oicq": "link:lib/modules/oicq",
     "pm2": "^7.0.3",
     "puppeteer": "^13.7",
@@ -47,10 +49,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.1",
     "eslint-config-flat-gitignore": "^2.3.0",
     "globals": "^17.6.0",
-    "prettier": "^3.9.4",
-    "eslint": "^10.2.1"
+    "prettier": "^3.9.4"
   },
   "imports": {
     "#miao": "./plugins/miao-plugin/components/index.js",
