@@ -43,6 +43,7 @@ Bot.adapter.push(
     }
 
     async makeFile(file, opts) {
+      if (typeof file === "string" && file.startsWith("base64://")) return file
       file = await Bot.Buffer(file, {
         http: true,
         size: 10485760,
@@ -108,8 +109,7 @@ Bot.adapter.push(
         else ret.push(data)
       }
 
-      for (const { file, name } of files)
-        ret.push(await sendFile(file, name))
+      for (const { file, name } of files) ret.push(await sendFile(file, name))
 
       if (message.length) ret.push(await send(message))
       if (ret.length === 1) return ret[0]
@@ -191,8 +191,14 @@ Bot.adapter.push(
     parseMsg(msg) {
       const array = []
       for (const i of Array.isArray(msg) ? msg : [msg])
-        if (typeof i === "object") array.push({ ...i.data, type: i.type })
-        else array.push({ type: "text", text: String(i) })
+        if (typeof i === "object") {
+          const message = { ...i.data, type: i.type }
+          if (message.type === "file") {
+            message.fid ||= message.file_id
+            message.name ||= message.file
+          }
+          array.push(message)
+        } else array.push({ type: "text", text: String(i) })
       return array
     }
 
@@ -207,6 +213,7 @@ Bot.adapter.push(
         await data.bot.sendApi("get_friend_msg_history", {
           user_id: data.user_id,
           message_seq,
+          message_id: message_seq,
           count,
           reverseOrder,
         })
@@ -222,6 +229,7 @@ Bot.adapter.push(
         await data.bot.sendApi("get_group_msg_history", {
           group_id: data.group_id,
           message_seq,
+          message_id: message_seq,
           count,
           reverseOrder,
         })
@@ -729,6 +737,53 @@ Bot.adapter.push(
       })
     }
 
+    async getGroupFileDownloadUrl(data, file_id) {
+      return (await this.getGroupFileUrl(data, file_id)).url
+    }
+
+    setEmojiLike(data, message_id, emoji_id) {
+      Bot.makeLog(
+        "info",
+        `回应群消息：${this.makeLog(message_id)}`,
+        `${data.self_id} => ${data.group_id}`,
+        true,
+      )
+      return data.bot.sendApi("set_msg_emoji_like", { message_id, emoji_id })
+    }
+
+    getAiCharacters(data, type) {
+      Bot.makeLog("info", `获取群${this.makeLog(data.group_id)}AI音色信息`, `${type}`, true)
+      return data.bot.sendApi("get_ai_characters", {
+        chat_type: type,
+        group_id: data.group_id,
+      })
+    }
+
+    sendGroupAiRecord(data, character_id, text) {
+      Bot.makeLog(
+        "info",
+        `发送${this.makeLog(character_id)}语音`,
+        `${data.self_id} => ${data.group_id}`,
+        true,
+      )
+      return data.bot.sendApi("send_group_ai_record", {
+        character: character_id,
+        group_id: data.group_id,
+        text,
+      })
+    }
+
+    async getLocalFileInfo(data, file_id) {
+      const msg = (await data.bot.sendApi("get_file", { file_id })).data
+      if (msg?.message) msg.message = this.parseMsg(msg.message)
+      return msg
+    }
+
+    sendGroupPoke(data, user_id) {
+      Bot.makeLog("info", "发送群戳一戳", `${data.self_id} => ${data.group_id}, ${user_id}`, true)
+      return data.bot.sendApi("group_poke", { group_id: data.group_id, user_id })
+    }
+
     getGroupFs(data) {
       return {
         upload: this.sendGroupFile.bind(this, data),
@@ -795,6 +850,7 @@ Bot.adapter.push(
         sendForwardMsg: this.sendFriendForwardMsg.bind(this, i),
         sendFile: this.sendFriendFile.bind(this, i),
         getInfo: this.getFriendInfo.bind(this, i),
+        getSimpleInfo: this.getFriendInfo.bind(this, i),
         getAvatarUrl() {
           return this.avatar || `https://q.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
         },
@@ -802,6 +858,7 @@ Bot.adapter.push(
         thumbUp: this.sendLike.bind(this, i),
         delete: this.deleteFriend.bind(this, i),
         getFileUrl: this.getPrivateFileUrl.bind(this, i),
+        getLocalFileInfo: this.getLocalFileInfo.bind(this, i),
       }
     }
 
@@ -900,7 +957,12 @@ Bot.adapter.push(
         getMemberList: this.getMemberList.bind(this, i),
         getMemberMap: this.getMemberMap.bind(this, i),
         pickMember: this.pickMember.bind(this, i, group_id),
-        pokeMember: qq => this.sendGroupMsg(i, { type: "poke", qq }),
+        pokeMember: qq => this.sendGroupPoke(i, qq),
+        setEmojiLike: this.setEmojiLike.bind(this, i),
+        getAiCharacters: this.getAiCharacters.bind(this, i),
+        sendGroupAiRecord: this.sendGroupAiRecord.bind(this, i),
+        getFileUrl: this.getGroupFileDownloadUrl.bind(this, i),
+        getLocalFileInfo: this.getLocalFileInfo.bind(this, i),
         setName: this.setGroupName.bind(this, i),
         setAvatar: this.setGroupAvatar.bind(this, i),
         setAdmin: this.setGroupAdmin.bind(this, i),
@@ -1196,8 +1258,15 @@ Bot.adapter.push(
             post_type: "message",
             message_type: "group",
             sub_type: "normal",
-            message: [{ ...data.file, type: "file" }],
-            raw_message: `[文件：${data.file.name}]`,
+            message: [
+              {
+                ...data.file,
+                fid: data.file.fid || data.file.file_id,
+                name: data.file.file || data.file.name,
+                type: "file",
+              },
+            ],
+            raw_message: `[文件：${data.file.file || data.file.name}]`,
           })
           break
         case "group_ban":
@@ -1326,8 +1395,15 @@ Bot.adapter.push(
             post_type: "message",
             message_type: "private",
             sub_type: "friend",
-            message: [{ ...data.file, type: "file" }],
-            raw_message: `[文件：${data.file.name}]`,
+            message: [
+              {
+                ...data.file,
+                fid: data.file.fid || data.file.file_id,
+                name: data.file.file || data.file.name,
+                type: "file",
+              },
+            ],
+            raw_message: `[文件：${data.file.file || data.file.name}]`,
           })
           break
         case "client_status":
@@ -1421,7 +1497,7 @@ Bot.adapter.push(
       Bot.em(`${data.post_type}.${data.notice_type}.${data.sub_type}`, data)
     }
 
-    makeRequest(data) {
+    async makeRequest(data) {
       switch (data.request_type) {
         case "friend":
           Bot.makeLog(
@@ -1448,6 +1524,23 @@ Bot.adapter.push(
           break
         default:
           Bot.makeLog("warn", `未知请求：${logger.magenta(data.raw)}`, data.self_id)
+      }
+
+      if (data.user_id && !data.nickname) {
+        let timeout
+        try {
+          const info = await Promise.race([
+            this.getFriendInfo(data),
+            new Promise(resolve => {
+              timeout = setTimeout(() => resolve(null), 5000)
+            }),
+          ])
+          data.nickname ||= info?.nickname
+        } catch (err) {
+          Bot.makeLog("debug", ["获取请求用户信息失败", err], data.self_id)
+        } finally {
+          clearTimeout(timeout)
+        }
       }
 
       data.bot.request_list.push(data)
