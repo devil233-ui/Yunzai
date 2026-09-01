@@ -2,6 +2,8 @@ import cfg from "../../lib/config/config.js"
 import path from "node:path"
 import { ulid } from "ulid"
 
+const getFileId = file => file?.fid || file?.file_id || file?.id
+
 Bot.adapter.push(
   new (class OneBotv11Adapter {
     id = "QQ"
@@ -194,7 +196,7 @@ Bot.adapter.push(
         if (typeof i === "object") {
           const message = { ...i.data, type: i.type }
           if (message.type === "file") {
-            message.fid ||= message.file_id
+            message.fid ||= getFileId(message)
             message.name ||= message.file
           }
           array.push(message)
@@ -667,6 +669,7 @@ Bot.adapter.push(
     }
 
     async getPrivateFileUrl(data, file_id) {
+      file_id = getFileId(file_id) || file_id
       return (
         await data.bot.sendApi("get_private_file_url", {
           user_id: data.user_id,
@@ -730,6 +733,10 @@ Bot.adapter.push(
     }
 
     getGroupFileUrl(data, file_id, busid) {
+      if (typeof file_id === "object") {
+        busid ??= file_id.busid
+        file_id = getFileId(file_id)
+      }
       return data.bot.sendApi("get_group_file_url", {
         group_id: data.group_id,
         file_id,
@@ -737,8 +744,8 @@ Bot.adapter.push(
       })
     }
 
-    async getGroupFileDownloadUrl(data, file_id) {
-      return (await this.getGroupFileUrl(data, file_id)).url
+    async getGroupFileDownloadUrl(data, file_id, busid) {
+      return (await this.getGroupFileUrl(data, file_id, busid)).url
     }
 
     setEmojiLike(data, message_id, emoji_id) {
@@ -1261,7 +1268,7 @@ Bot.adapter.push(
             message: [
               {
                 ...data.file,
-                fid: data.file.fid || data.file.file_id,
+                fid: getFileId(data.file),
                 name: data.file.file || data.file.name,
                 type: "file",
               },
@@ -1398,7 +1405,7 @@ Bot.adapter.push(
             message: [
               {
                 ...data.file,
-                fid: data.file.fid || data.file.file_id,
+                fid: getFileId(data.file),
                 name: data.file.file || data.file.name,
                 type: "file",
               },
